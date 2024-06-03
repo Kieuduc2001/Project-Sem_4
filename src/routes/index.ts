@@ -1,33 +1,44 @@
+import { FC, LazyExoticComponent, lazy } from 'react';
 
-import { FC, LazyExoticComponent, lazy } from 'react'
-
-type LazyComponent = LazyExoticComponent<FC<any>>
+type LazyComponent = LazyExoticComponent<FC<any>>;
 
 interface RouteConfig {
-  path: string
-  component: LazyComponent
-  title: string
-  roles: string[]
+  path: string;
+  component: LazyComponent;
+  title: string;
+  roles: string[];
 }
 
-const Attendence = lazy(() => import('../pages/Attendence/Attendence'))
-const Students = lazy(() => import('../pages/Students/Student-list'))
-const SchoolYears = lazy(() => import('../pages/School-years/School-years'))
-const ClassesList = lazy(() => import('../pages/Category/School-year-class'))
-const Teachers = lazy(() => import('../pages/Teachers/Teachers'))
-const SchoolYearSubject = lazy(() => import('../pages/Category/School-year-subjects'));
-const SchoolYearTeacher = lazy(() => import('../pages/Category/Teacher-school-year'));
+const Attendence = lazy(() => import('../pages/Attendence/Attendence'));
+const Students = lazy(() => import('../pages/Students/Student-list'));
+const Teachers = lazy(() => import('../pages/School-years/TeacherList'));
+
+const SchoolYears = lazy(() => import('../pages/School-years/School-years'));
+const ClassesList = lazy(() => import('../pages/Category/School-year-class'));
+
+const SchoolYearSubject = lazy(
+  () => import('../pages/Category/School-year-subjects')
+);
+const SchoolYearTeacher = lazy(
+  () => import('../pages/Category/Teacher-school-year')
+);
 const SubjectProgram = lazy(() => import('../pages/Category/Subject-program'));
 // const Profile = lazy(() => import('../pages/Profile'));
-const NoSchedule = lazy(() => import('../pages/Teaching/No-schedule'))
-const CreateCalendarRl = lazy(() => import('../pages/Teaching/calendar-release'))
-const CreateSchedule = lazy(() => import('../pages/Teaching/Create-schedule'))
-const Schedule = lazy(() => import('../pages/Teaching/Schedules'))
-const TeachingAssign = lazy(() => import('../pages/Teaching/Teaching-assignment'))
-const AssignmentList = lazy(() => import('../pages/Teaching/Teaching-assign-list'))
-const Acknowledge = lazy(() => import('../pages/Acknowledge'))
-const Evaluate = lazy(() => import('../pages/Evaluate'))
-const FeeList = lazy(() => import('../pages/Fee/Fee-list'))
+const NoSchedule = lazy(() => import('../pages/Teaching/No-schedule'));
+const CreateCalendarRl = lazy(
+  () => import('../pages/Teaching/calendar-release')
+);
+const CreateSchedule = lazy(() => import('../pages/Teaching/Create-schedule'));
+const Schedule = lazy(() => import('../pages/Teaching/Schedules'));
+const TeachingAssign = lazy(
+  () => import('../pages/Teaching/Teaching-assignment')
+);
+const AssignmentList = lazy(
+  () => import('../pages/Teaching/Teaching-assign-list')
+);
+const Acknowledge = lazy(() => import('../pages/Acknowledge'));
+const Evaluate = lazy(() => import('../pages/Evaluate'));
+const FeeList = lazy(() => import('../pages/Fee/Fee-list'));
 
 export const coreRoutes: RouteConfig[] = [
   {
@@ -131,6 +142,6 @@ export const coreRoutes: RouteConfig[] = [
     component: FeeList,
     title: 'Fee',
     roles: ['ROLE_BGH'],
-  }
-]
-export default coreRoutes
+  },
+];
+export default coreRoutes;
