@@ -11,7 +11,6 @@ import {
   message,
 } from 'antd';
 import moment from 'moment';
-import mainAxios from '../../apis/main-axios';
 import Loader from '../../common/Loader';
 import teacherApi from '../../apis/urlApi';
 import { SchoolYearsData } from '../../types/response';
@@ -26,18 +25,16 @@ export default function SchoolYears() {
     fetchData();
   }, []);
 
-  const fetchData = () => {
-    setIsLoading(true);
-    mainAxios
-      .get('/api/v1/school/school-year')
-      .then((response) => {
-        setSchoolYears(response.data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
+  const fetchData = async() => {
+    try{
+      setIsLoading(true);
+      const res =  await teacherApi.getSchoolYear();
+      setSchoolYears(res.data);
+      setIsLoading(false);
+    }catch(error) {
         console.error('Error fetching data:', error);
         setIsLoading(false);
-      });
+      }
   };
 
   const showModal = () => {
@@ -51,8 +48,7 @@ export default function SchoolYears() {
   const handleSubmit = async () => {
     try {
       const formData = await form.validateFields();
-      const res = await teacherApi.postCreateSchoolYear(formData);
-
+      await teacherApi.postCreateSchoolYear(formData);
       setIsModalOpen(false);
       fetchData();
       message.success('Data submitted successfully!');

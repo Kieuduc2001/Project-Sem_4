@@ -21,12 +21,12 @@ const SignIn = () => {
       setLocalStorageItem(Storage.user, JSON?.stringify(response?.data))
       navigate('/')
       notification.success({
-        message: 'Login success',
+        message: 'Đăng nhập thành công',
       })
     } catch (error) {
       notification.error({
-        message: 'Login Failed',
-        description: 'An error occurred while attempting to log in.',
+        message: 'Đăng nhập không thành thành công',
+        description: 'Tên Đăng Nhập & Mật Khẩu Không Đúng',
       })
     }
   }
@@ -49,7 +49,7 @@ const SignIn = () => {
         <div className="w-full border-stroke dark:border-strokedark xl:w-1/2 xl:border-l-2">
           <div className="w-full p-4 sm:p-12.5 xl:p-17.5">
             <h2 className="text-2xl font-bold text-black mb-9 dark:text-white sm:text-title-xl2">
-              Sign In to School Manager
+             Đăng Nhập 
             </h2>
 
             <Form
@@ -61,12 +61,12 @@ const SignIn = () => {
             >
               <div className="mb-4">
                 <label htmlFor="username" className="mb-2.5 block font-medium text-black dark:text-white">
-                  Username
+                  Tên Đăng Nhập
                 </label>
                 <div className="relative">
-                  <Form.Item name="username" rules={[{ required: true, message: 'Please input your Username!' }]}>
+                  <Form.Item name="username" rules={[{ required: true, message: 'Không thể bỏ trống' }]}>
                     <Input
-                      placeholder="Username"
+                      placeholder="Tên Đăng Nhập"
                       className="w-full py-4 pl-6 pr-10 bg-transparent border rounded-lg outline-none border-stroke focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
                   </Form.Item>
@@ -87,17 +87,17 @@ const SignIn = () => {
 
               <div className="mb-6">
                 <label htmlFor="password" className="mb-2.5 block font-medium text-black dark:text-white">
-                  Re-type Password
+                 Mật Khẩu
                 </label>
                 <div className="relative">
                   <Form.Item
                     name="password"
                     className="pb-3"
-                    rules={[{ required: true, message: 'Please input your Password!' }]}
+                    rules={[{ required: true, message: 'Không thể bỏ trống' }]}
                   >
                     <Input
-                      type="password"
-                      placeholder="Password"
+                      type="passord"
+                      placeholder="Mật Khẩu"
                       className="w-full py-4 pl-6 pr-10 bg-transparent border rounded-lg outline-none border-stroke focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
                   </Form.Item>
@@ -129,15 +129,15 @@ const SignIn = () => {
                   // type="submit"
                   className="w-full text-xl text-white transition border rounded-lg cursor-pointer h-14 border-primary bg-primary hover:bg-opacity-50"
                 >
-                  Sign In
+                 Đăng Nhập 
                 </Button>
               </div>
 
               <div className="mt-6 text-center">
                 <p>
-                  Don’t have any account?{' '}
+                 Bạn Chưa Có Tài Khoản
                   <Link to="/auth/signup" className="text-primary">
-                    Sign Up
+                   Đăng Kí
                   </Link>
                 </p>
               </div>
