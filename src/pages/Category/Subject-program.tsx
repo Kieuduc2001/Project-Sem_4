@@ -45,30 +45,26 @@ export default function SchoolProgram() {
         }
     }, [defaultGradeId]);
 
-    const fetchData = (value: number) => {
-        mainAxios
-            .get(`/api/v1/school/school-year-subject-grade?gradeId=${value}`)
-            .then((response) => {
-                setSchoolProgram(response.data);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
+    const fetchData = async(value: number) => {
+        try{
+            const res  = await mainAxios.get(`/api/v1/school/school-year-subject-grade?gradeId=${value}`)
+            setSchoolProgram(res.data);
+        }catch(error)  {
+  console.error('Error fetching data:', error);
+            };
     };
 
-    const fetchGrades = () => {
-        teacherApi
-            .getGrades()
-            .then((response) => {
-                const gradesData = response.data.body;
-                setGrades(gradesData);
-                if (gradesData.length > 0) {
-                    setDefaultGradeId(gradesData[0].id);
-                }
-            })
-            .catch((error) => {
+    const fetchGrades = async() => {
+        try{
+            const res =  await teacherApi.getGrades();
+            setGrades(res.data.body);
+            if (grades.length > 0) {
+                setDefaultGradeId(grades[0].id);
+            }
+        }
+        catch(error) {
                 console.error('Error fetching grades:', error);
-            });
+            };
     };
 
     useEffect(() => {
@@ -98,13 +94,13 @@ export default function SchoolProgram() {
     const handleSubmit = async () => {
         try {
             const formData = await form.validateFields();
-            const res = await mainAxios.post(
+            await mainAxios.post(
                 '/api/v1/school/creat-school-year-subject-grade',
                 formData
             );
 
             setIsModalOpen(false);
-            message.success('Data submitted successfully!');
+            message.success('Thành Công');
         } catch (error: any) {
             if (error.response) {
                 console.error('Server Error:', error.response.data);
@@ -127,7 +123,7 @@ export default function SchoolProgram() {
                 <Loader />
             ) : (
                 <div>
-                    <Row style={{ marginBottom: '15px' }}>
+                    <Row className='mb-[15px]'>
                         <Col span={12}>
                             <Select
                                 className="w-30"

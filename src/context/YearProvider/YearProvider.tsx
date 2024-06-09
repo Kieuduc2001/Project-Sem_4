@@ -1,4 +1,4 @@
-// src/contexts/SchoolYearContext.js
+
 import React, {
   createContext,
   useState,
@@ -7,6 +7,9 @@ import React, {
   ReactNode,
 } from 'react';
 import teacherApi from '../../apis/urlApi';
+
+import { getLocalStorageItem, setLocalStorageItem } from '../../utils/storage/local-storage';
+import { Storage } from '../../contstants/storage';
 
 export type YearContextType = {
   idYear: number | null;
@@ -26,19 +29,21 @@ interface Props {
 
 const YearProvider: React.FC<Props> = ({ children }) => {
   const [idYear, setIdYear] = useState<any>(() => {
-    const storedYear = localStorage.getItem('idYear');
-    return storedYear ? parseInt(storedYear, 10) : 1;
+    const storedYear = getLocalStorageItem(Storage.idYear);
+    return storedYear ? parseInt(storedYear, 10) : 0;
   });
   const [schoolYears, setSchoolYears] = useState<any[]>([]);
   useEffect(() => {
     const fetchData = async (id: number) => {
       try {
         const res = await teacherApi.getSchoolYear();
+        console.log(res);
         setSchoolYears(res?.data);
         const defaultOption = res?.data.find((year: any) => year.id === id);
         if (defaultOption) {
           setIdYear(defaultOption.id);
         }
+        setLocalStorageItem(Storage.idYear, JSON?.stringify(defaultOption.id))
       } catch (error) {
         console.error('Error fetching data:', error);
       }

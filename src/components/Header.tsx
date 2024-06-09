@@ -4,6 +4,7 @@ import { Select } from 'antd';
 import DropdownUser from './DropdownUser';
 import { useContext } from 'react';
 import { YearContext } from '../context/YearProvider/YearProvider';
+import Typography from 'antd/es/typography/Typography';
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
@@ -102,7 +103,8 @@ const Header = (props: {
               </div>
             </form>
           </div>
-          <div style={{ marginRight: '14px' }}>
+          <div className='flex items-center'>
+            <Typography className='text-xl text-font-medium mr-4'>Năm Học</Typography>
             <Select
               className="w-[130px] h-10"
               options={optionsYear}
