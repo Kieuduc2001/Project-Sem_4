@@ -21,9 +21,10 @@ export default function SchoolYears() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
-
+  console.log(schoolYears);
   useEffect(() => {
     fetchData();
+    console.log('aaaa', fetchData);
   }, []);
 
   const fetchData = () => {
@@ -34,6 +35,7 @@ export default function SchoolYears() {
         setSchoolYears(response.data);
         setIsLoading(false);
       })
+
       .catch((error) => {
         console.error('Error fetching data:', error);
         setIsLoading(false);
