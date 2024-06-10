@@ -3,6 +3,7 @@ import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import { useNavigate } from 'react-router-dom';
+import mainAxios from '../../apis/main-axios';
 
 const NoTimetable: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,7 +27,7 @@ const NoTimetable: React.FC = () => {
                 schoolYearId: idYear,
                 releaseAt: values.releaseAt.format(),
             };
-            await axios.post('/api/v1/schedule/create-calendar-release', postData);
+            await mainAxios.post('/api/v1/schedule/create-calendar-release', postData);
             message.success('Thời khóa biểu đã được tạo thành công');
             setIsModalOpen(false);
             navigate('/create-schedule')
