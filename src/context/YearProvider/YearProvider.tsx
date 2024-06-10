@@ -10,6 +10,7 @@ import teacherApi from '../../apis/urlApi';
 
 import { getLocalStorageItem, setLocalStorageItem } from '../../utils/storage/local-storage';
 import { Storage } from '../../contstants/storage';
+import { getCookie } from '../../utils/storage//cookie-storage';
 
 export type YearContextType = {
   idYear: number | null;
@@ -33,7 +34,9 @@ const YearProvider: React.FC<Props> = ({ children }) => {
     return storedYear ? parseInt(storedYear, 10) : 0;
   });
   const [schoolYears, setSchoolYears] = useState<any[]>([]);
+  const token = getCookie('token')
   useEffect(() => {
+    if(!token) return;
     const fetchData = async (id: number) => {
       try {
         const res = await teacherApi.getSchoolYear();
