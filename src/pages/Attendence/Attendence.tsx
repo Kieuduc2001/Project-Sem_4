@@ -25,7 +25,7 @@ const Attendences = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [attendence, setAttendence] = useState('attendance-by-day');
   const [form] = Form.useForm();
-  const [attendanceStatus, setAttendanceStatus] = useState<{ [key: number]: string }>({});
+  const [attendanceStatus, setAttendanceStatus] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -34,22 +34,39 @@ const Attendences = () => {
       try {
         const res = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
         setStudent(res?.data);
-        setIsLoading(false);
+
+        const initialStatus = res?.data.reduce((acc: any, student: any) => {
+          acc[student.id] = 'CO_MAT';
+          return acc;
+        }, {});
+        setAttendanceStatus(initialStatus);
       } catch (error) {
         console.error('Failed to fetch students:', error);
+      } finally {
         setIsLoading(false);
       }
     };
     fetchStudents();
   }, [classId]);
 
+  useEffect(() => {
+    const fetchSchoolYearClassData = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch school year class data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSchoolYearClassData();
+  }, [idYear]);
+
   const handleChange = (value: number) => {
     setClassId(value);
-  };
-
-  const rowSelection = {
-    onSelect: (record: DataTypeAttendence, selected: boolean, selectedRows: DataTypeAttendence[]) => { },
-    onSelectAll: (selected: boolean, selectedRows: DataTypeAttendence[], changeRows: DataTypeAttendence[]) => { },
   };
 
   const formatDate = (dateString: string) => {
@@ -61,10 +78,17 @@ const Attendences = () => {
   };
 
   const handleCheckboxChange = (id: number, type: string) => {
-    setAttendanceStatus(prevState => ({
-      ...prevState,
-      [id]: type
-    }));
+    setAttendanceStatus(prevState => {
+      const newStatus = { ...prevState };
+
+      if (type === 'CO_MAT') {
+        newStatus[id] = prevState[id] === 'CO_MAT' ? '' : 'CO_MAT';
+      } else {
+        newStatus[id] = prevState[id] === 'NGHI_HOC' ? '' : 'NGHI_HOC';
+      }
+
+      return newStatus;
+    });
   };
 
   const columnsAttendenceByDay: TableColumnsType<DataTypeAttendence> = [
@@ -96,6 +120,12 @@ const Attendences = () => {
       width: '10%',
       key: 'Co_Mat',
       align: 'center',
+      render: (_, record) => (
+        <Checkbox
+          checked={attendanceStatus[record.key] === 'CO_MAT'}
+          onChange={() => handleCheckboxChange(record.key, 'CO_MAT')}
+        />
+      ),
     },
     {
       title: 'Nghỉ học',
@@ -103,13 +133,24 @@ const Attendences = () => {
       width: '10%',
       key: 'Nghi_hoc',
       align: 'center',
+      render: (_, record) => (
+        <Checkbox
+          checked={attendanceStatus[record.key] === 'NGHI_HOC'}
+          onChange={() => handleCheckboxChange(record.key, 'NGHI_HOC')}
+        />
+      ),
     },
     {
-      title: 'ghi chú',
+      title: 'Ghi chú',
       dataIndex: 'Ghi_Chu',
       width: '20%',
       key: 'Ghi_Chu',
       align: 'center',
+      render: (_, record) => (
+        <Form.Item name={['note', record.key]} key={record.key}>
+          <TextArea autoSize />
+        </Form.Item>
+      ),
     },
     {
       title: 'Trạng thái',
@@ -117,31 +158,35 @@ const Attendences = () => {
       width: '14%',
       key: 'Trang_Thai',
       align: 'center',
+      render: () => 'chưa thông báo',
     },
   ];
 
   const dataAttendenceByDay = student.map((data, index) => ({
     key: data.id,
     Stt: index + 1,
-    Ho_Ten: data.students.lastName + ' ' + data.students.firstName, // Assuming s contains the name of the student
+    Ho_Ten: `${data.students.lastName} ${data.students.firstName}`,
     Ngay_sinh: formatDate(data.students.birthday.substring(0, 10)),
     Co_Mat: (
       <Checkbox
-        checked={attendanceStatus[data.id] === 'Co_Mat'}
-        onChange={() => handleCheckboxChange(data.id, 'Co_Mat')}
+        checked={attendanceStatus[data.id] === 'CO_MAT'}
+        onChange={() => handleCheckboxChange(data.id, 'CO_MAT')}
       />
     ),
     Nghi_hoc: (
       <Checkbox
-        checked={attendanceStatus[data.id] === 'Nghi_Co_Phep'}
-        onChange={() => handleCheckboxChange(data.id, 'Nghi_Co_Phep')}
+        checked={attendanceStatus[data.id] === 'NGHI_HOC'}
+        onChange={() => handleCheckboxChange(data.id, 'NGHI_HOC')}
       />
     ),
-    Ghi_Chu: <Form.Item name={['note', data.id]} key={data.id}>
-      <TextArea autoSize />
-    </Form.Item>,
+    Ghi_Chu: (
+      <Form.Item name={['note', data.id]} key={data.id}>
+        <TextArea autoSize />
+      </Form.Item>
+    ),
     Trang_Thai: 0 ? 'Đã thông báo' : 'chưa thông báo',
   }));
+
   const columnsAttendenceByMonth: TableColumnsType<DataTypeAttendence> = [
     {
       title: 'Stt',
@@ -194,49 +239,32 @@ const Attendences = () => {
       align: 'center',
     },
   ];
+
   const dataAttendenceByMonth = student.map((data) => ({
     key: data.id,
-    Ho_Ten: data.students.lastName + data.students.firstName, // Assuming `s` contains the name of the student
-    Ngay_sinh: data.students.birthday.substring(0, 10),
+    Ho_Ten: `${data.students.lastName} ${data.students.firstName}`,
+    Ngay_sinh: formatDate(data.students.birthday.substring(0, 10)),
     Stt: data.id,
-    So_Luot_Muon: 10,
-    Tong_Ngay_nghi: 10,
-    Nghi_Co_Phep: 5,
-    Nghi_Khong_Phep: 5,
+    So_Luot_Muon: 0,
+    Tong_Ngay_nghi: 0,
+    Nghi_Co_Phep: 0,
+    Nghi_Khong_Phep: 0,
   }));
-
-  useEffect(() => {
-    const fetchSchoolYearClassData = async () => {
-      if (idYear === null) return;
-      setIsLoading(true);
-      try {
-        const res = await teacherApi.getSchoolYearClass(idYear);
-        setSchoolYearClass(res?.data);
-      } catch (error) {
-        console.error('Failed to fetch school year class data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchSchoolYearClassData();
-  }, [idYear]);
 
   const handleSubmit = async () => {
     try {
-      const values = form.getFieldsValue();
-      const { note } = values;
-      const updatedValues = {
-        ...values,
-        attendanceStatus
+      const values = await form.validateFields();
+console.log(Form.useForm());
+      const payload = {
+        dayOff:1,
+        classId: classId,
+        listStudent: Object.keys(attendanceStatus).map(studentId => ({
+          studentYearInfoId: parseInt(studentId),
+          status: attendanceStatus[studentId],
+          note: values.note[studentId] || '', // Giả sử note là một object có key là studentId
+        })),
       };
-
-      for (const studentId in updatedValues.attendanceStatus) {
-        const status = updatedValues.attendanceStatus[studentId] === 'Co_Mat';
-        const studentNote = note ? note[studentId] : '';
-        await teacherApi.postAtendence(Number(studentId), status, studentNote)
-          ;
-      }
-      message.success('Attendance data submitted successfully!');
+console.log(payload)
     } catch (errorInfo) {
       console.error('Failed to submit form:', errorInfo);
       message.error('Failed to submit attendance data');
@@ -259,11 +287,10 @@ const Attendences = () => {
           Điểm danh theo tháng
         </div>
       </div>
-      <Form
-        form={form}>
+      <Form form={form}>
         <div className={`${attendence !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
           <div style={{ display: 'flex', padding: '16px' }}>
-            <div style={{ marginRight: '14px' }}>
+            <Form.Item className="classId" style={{ marginRight: '14px' }}>
               <Select defaultValue={classId} style={{ width: 150 }} onChange={handleChange}>
                 {schoolYearClass.map((classData) => (
                   <Option key={classData.id} value={classData.id}>
@@ -271,13 +298,14 @@ const Attendences = () => {
                   </Option>
                 ))}
               </Select>
-            </div>
-            <Space direction="vertical">
+            </Form.Item>
+            <Form.Item className="dayOff" name="dayOff"> {/* Thêm name cho Form.Item */}
               <DatePicker
                 disabledDate={(date) => date.isBefore(dayjs())}
                 className="h-10"
               />
-            </Space>
+            </Form.Item>
+
             <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
               Tất cả: {student.length}
             </div>
@@ -292,7 +320,7 @@ const Attendences = () => {
             </div>
             <div style={{ width: '560px' }}>
               <Button type="primary" style={{ float: 'right', background: '#349634' }}>
-                Thông báo cho PH
+                Sửa Đổi
               </Button>
             </div>
           </div>
@@ -301,17 +329,15 @@ const Attendences = () => {
           ) : (
             <div className="list-student">
               <Table
-                rowSelection={{ ...rowSelection }}
                 columns={columnsAttendenceByDay}
                 dataSource={dataAttendenceByDay}
                 pagination={false}
                 bordered
-                scroll={{ y: 385 }}
               />
             </div>
           )}
           <div className="submit">
-            <Button type="primary" className="btn-submit">
+            <Button type="primary" className="btn-submit" onClick={handleSubmit}>
               Lưu Lại
             </Button>
           </div>
@@ -342,7 +368,7 @@ const Attendences = () => {
           />
         </div>
         <div className="submit">
-          <Button type="primary" className="btn-submit">
+          <Button type="primary" className="btn-submit" onClick={handleSubmit}>
             Lưu Lại
           </Button>
         </div>
