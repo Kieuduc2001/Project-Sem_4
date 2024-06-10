@@ -110,8 +110,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
 
+                        <i className=" fa-solid fa-chart-simple"></i>
                         Thống kê
-
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -159,6 +159,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
 
+                        <i className=" fa-solid fa-book"></i>
                         Hồ sơ
 
                       </NavLink>
@@ -219,9 +220,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
+      
 
+                        <i className=" fa-solid fa-list"></i>
                         Danh mục
-
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -293,6 +295,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
 
+                        <i className="fa-solid fa-chalkboard"></i>
                         Giảng dạy
 
                       </NavLink>
@@ -367,8 +370,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
 
+                        <i className="fa-solid fa-pen-to-square"></i>
                         Đánh giá
-
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -440,9 +443,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
-
+  <i className=" fa-solid fa-hand-point-up"></i>
                         Hệ thống
-
+                
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
