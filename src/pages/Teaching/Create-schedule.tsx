@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Table, Button, Row, Col, Select, message, Typography } from 'antd';
+import { Table, Button, Row, Col, Select, message, Typography, Form } from 'antd';
 import './Timetable.css';
 import teacherApi from '../../apis/urlApi';
-import { SchoolYearClassData, SubjectForSchedule } from '../../types/response'; // Update import
+import { SchoolYearClassData, SubjectForSchedule } from '../../types/response';
 import Loader from '../../common/Loader';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import mainAxios from '../../apis/main-axios';
@@ -22,12 +22,13 @@ interface Schedule {
 }
 
 const Timetable: React.FC = () => {
-    const [schedule, setSchedule] = useState<Schedule>({});
     const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
     const [subjectTeacher, setSubjectTeacher] = useState<SubjectForSchedule[]>([]);
     const { idYear } = useContext(YearContext);
     const [classId, setClassId] = useState<number | null>(1);
     const [isLoading, setIsLoading] = useState(true);
+    const [classSchedules, setClassSchedules] = useState<{ [classId: string]: Schedule }>({});
+    const [form] = Form.useForm();
 
     useEffect(() => {
         const fetchSchoolYearClassData = async () => {
@@ -65,6 +66,13 @@ const Timetable: React.FC = () => {
 
     const handleClassChange = (value: number) => {
         setClassId(value);
+        // Initialize schedule for the selected class if not already initialized
+        if (!classSchedules[value]) {
+            setClassSchedules(prev => ({
+                ...prev,
+                [value]: {},
+            }));
+        }
     };
 
     const handleSelectChange = (
@@ -76,16 +84,19 @@ const Timetable: React.FC = () => {
     ) => {
         const shiftOffset = shift === 'morning' ? 0 : 4;
         const key = `${day}-${lesson + shiftOffset}`;
-        setSchedule(prev => ({
+        setClassSchedules(prev => ({
             ...prev,
-            [key]: {
-                ...prev[key],
-                [type]: value,
+            [String(classId)]: {
+                ...(prev[String(classId)] || {}),
+                [key]: {
+                    ...(prev[String(classId)]?.[key] || {}),
+                    [type]: value,
+                },
             },
         }));
     };
 
-    const renderSelect = (day: Day, lesson: number, shift: Shift, type: Type) => {
+    const renderSelect: (classId: number, day: Day, lesson: number, shift: Shift, type: Type) => JSX.Element | null = (classId, day, lesson, shift, type) => {
         const shiftOffset = shift === 'morning' ? 0 : 4;
         const key = `${day}-${lesson + shiftOffset}`;
         let options: { id: number; name: string }[] = [];
@@ -101,7 +112,7 @@ const Timetable: React.FC = () => {
             return (
                 <Select
                     style={{ width: 120 }}
-                    value={schedule[key]?.[type]}
+                    value={classSchedules[classId]?.[key]?.[type]}
                     onChange={(value) => handleSelectChange(value, day, lesson, shift, type)}
                 >
                     {options.map((option) => (
@@ -111,8 +122,9 @@ const Timetable: React.FC = () => {
                     ))}
                 </Select>
             );
+
         } else if (type === 'teacher') {
-            const selectedSubjectName = schedule[key]?.subject;
+            const selectedSubjectName = classSchedules[classId]?.[key]?.subject;
             const selectedSubject = subjectTeacher.find(subject => subject.subject.name === selectedSubjectName);
 
             return (
@@ -133,14 +145,16 @@ const Timetable: React.FC = () => {
             const rowSubject: any = { indexLesson: `<b>Tiết ${i}</b> - Môn học` };
             const rowTeacher: any = { indexLesson: `Giáo viên` };
             days.forEach(day => {
-                rowSubject[day.toLowerCase()] = renderSelect(day, i, shift, 'subject');
-                rowTeacher[day.toLowerCase()] = renderSelect(day, i, shift, 'teacher');
+                rowSubject[day.toLowerCase()] = renderSelect(classId ?? 0, day, i, shift, 'subject');
+                rowTeacher[day.toLowerCase()] = renderSelect(classId ?? 0, day, i, shift, 'teacher');
+
             });
             transformedData.push(rowSubject, rowTeacher);
         }
 
         return transformedData;
     };
+
 
     const columns = [
         {
@@ -186,6 +200,40 @@ const Timetable: React.FC = () => {
     const morningData = transformScheduleData('morning');
     const afternoonData = transformScheduleData('afternoon');
 
+    const handleSubmit = async () => {
+        try {
+            const calendarReleaseId = form.getFieldValue('calendarReleaseId');
+
+            const scheduleDetails = Object.keys(classSchedules[String(classId)] || {}).map(key => {
+                const [day, lessonStr] = key.split('-');
+                const lesson = parseInt(lessonStr, 10);
+                const studyTime = lesson <= 4 ? 'SANG' : 'CHIEU';
+                const teacherSubject = subjectTeacher.find(subject => subject.subject.name === classSchedules[String(classId)][key]?.subject);
+
+                return {
+                    indexLesson: lesson,
+                    studyTime,
+                    dayOfWeek: day.toUpperCase(),
+                    note: '',
+                    teacherSchoolYearClassSubjectId: teacherSubject ? teacherSubject.teacher.teacherSchoolYearId : 0,
+
+                };
+            });
+
+            const postData = {
+                calendarReleaseId,
+                classId,
+                scheduleDetailCreate: scheduleDetails,
+            };
+
+            await mainAxios.post('/api/v1/schedule/create-schedule', postData);
+            message.success('Thời khóa biểu đã được tạo thành công');
+        } catch (error) {
+            console.error('Failed to submit form:', error);
+            message.error('Có lỗi xảy ra khi tạo thời khóa biểu');
+        }
+    };
+
     return (
         <div className="timetable-container">
             {isLoading ? (
@@ -201,9 +249,10 @@ const Timetable: React.FC = () => {
                                     </Option>
                                 ))}
                             </Select>
+
                         </Col>
                         <Col>
-                            <Button type="primary">Export</Button>
+                            <Button type="primary" onClick={handleSubmit}>Xác nhận</Button>
                         </Col>
                     </Row>
 
@@ -231,3 +280,4 @@ const Timetable: React.FC = () => {
 };
 
 export default Timetable;
+
