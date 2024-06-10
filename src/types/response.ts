@@ -218,16 +218,13 @@ export interface DataTypeEvaluate {
   Hanh_kiem: string;
   Tong: number;
 }
-
 export interface DataTypeAttendence {
   key: number;
   Stt: number;
   Ho_Ten: string;
   Ngay_sinh: string;
   Co_Mat: JSX.Element;
-  Nghi_Co_Phep: JSX.Element;
-  Nghi_Khong_Phep: JSX.Element;
-  Ghi_Chu: JSX.Element;
+  Nghi_Hoc: JSX.Element;
   Trang_Thai: number
 }
 
