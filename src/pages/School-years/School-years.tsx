@@ -20,21 +20,22 @@ export default function SchoolYears() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(true);
-
+  console.log(schoolYears);
   useEffect(() => {
     fetchData();
+    console.log('aaaa', fetchData);
   }, []);
 
-  const fetchData = async() => {
-    try{
+  const fetchData = async () => {
+    try {
       setIsLoading(true);
-      const res =  await teacherApi.getSchoolYear();
+      const res = await teacherApi.getSchoolYear();
       setSchoolYears(res.data);
       setIsLoading(false);
-    }catch(error) {
-        console.error('Error fetching data:', error);
-        setIsLoading(false);
-      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setIsLoading(false);
+    }
   };
 
   const showModal = () => {
