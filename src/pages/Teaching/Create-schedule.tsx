@@ -53,6 +53,7 @@ const Timetable: React.FC = () => {
             setIsLoading(true);
             try {
                 const res = await mainAxios.get(`/api/v1/schedule/get-teacher-class-subject?classId=${classId}`);
+                console.log(res);
                 setSubjectTeacher(res?.data || []);
             } catch (error) {
                 console.error('Failed to fetch subject data:', error);
@@ -262,16 +263,15 @@ const Timetable: React.FC = () => {
                         dataSource={morningData}
                         pagination={false}
                         bordered
-                        rowClassName={(record, index) => (index % 2 === 0 ? 'even-row' : 'odd-row')}
+                        rowClassName={(_, index) => (index % 2 === 0 ? 'even-row' : 'odd-row')}
                     />
-
                     <h2 className='mb-3 mt-3 text-lg'>Buổi chiều</h2>
                     <Table
                         columns={columns}
                         dataSource={afternoonData}
                         pagination={false}
                         bordered
-                        rowClassName={(record, index) => (index % 2 === 0 ? 'even-row' : 'odd-row')}
+                        rowClassName={(_, index) => (index % 2 === 0 ? 'even-row' : 'odd-row')}
                     />
                 </div>
             )}

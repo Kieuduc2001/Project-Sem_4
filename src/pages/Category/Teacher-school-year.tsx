@@ -52,7 +52,9 @@ export default function SchoolYearTeacher() {
             .getSchoolYear()
             .then((response) => {
                 setSchoolYears(response.data);
+                console.log(response.data);
             })
+
             .catch((error) => {
                 console.error('Error fetching school years:', error);
             });
