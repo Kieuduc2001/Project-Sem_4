@@ -14,7 +14,6 @@ import {
 import teacherApi from '../../apis/urlApi';
 import {
     FeeList,
-    GradeData,
 } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
