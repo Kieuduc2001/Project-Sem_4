@@ -34,6 +34,11 @@ enum URL {
   GET_FEE_PERIOD = '/api/v1/fee-period/getBy',
   CREATE_FEE_PERIOD = '/api/v1/fee-period/create',
   GET_SCOPES = '/api/v1/school-year-fee/getUnitScopePaymentMethod',
+  //Homework
+  GET_HOMEWORK = '/api/v1/getHomeWorksByTeacherSchoolYearClassSubject',
+  GET_HOMEWORK_DETAILS = '/api/v1/getHomeWorkDetail',
+  GET_TEACHER_FOR_HOMEWROK = '/api/v1/school/teacher-school-year-class-subject-by-teacher',
+  CREATE_HOMEWORK = '/api/v1/createHomeWork',
 }
 
 const teacherApi = {
@@ -132,6 +137,9 @@ const teacherApi = {
   getStudents: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_STUDENTS_YEARS}?bySchoolYearId=${id}`);
   },
+  getStudentByClass: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_STUDENTS_YEARS}?bySchoolYearClassId=${id}`);
+  },
   getSchedule: (): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_SCHEDULE}`)
   },
@@ -178,6 +186,22 @@ const teacherApi = {
     }[];
   }): Promise<IResponse<any>> => {
     return mainAxios.post(URL.CREATE_FEE_PERIOD, payload);
+  },
+  getHomework: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_HOMEWORK}?teacherSchoolYearClassSubjectId=${id}`)
+  },
+  getHomeworkDetails: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_HOMEWORK_DETAILS}?homeWorkId=${id}`)
+  },
+  getHomeworkTeacher: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_TEACHER_FOR_HOMEWROK}?schoolYearId=${id}`)
+  },
+  postCreateHomework: (formData: FormData): Promise<IResponse<any>> => {
+    return mainAxios.post(URL.CREATE_HOMEWORK, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   },
 };
 export default teacherApi;

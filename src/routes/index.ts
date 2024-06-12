@@ -42,6 +42,12 @@ const Evaluate = lazy(() => import('../pages/Evaluate'));
 const FeeSign = lazy(() => import('../pages/Fee/Fee-sign'));
 const FeeList = lazy(() => import('../pages/Fee/Fee-list'));
 
+const HwList = lazy(() => import('../pages/Homework/List-hw'));
+const HwDetails = lazy(() => import('../pages/Homework/Hw-details'));
+// const SubmitedHwList = lazy(() => import('../pages/Homework/Submited-hw'));
+
+
+
 export const coreRoutes: RouteConfig[] = [
   {
     path: '/students',
@@ -104,7 +110,7 @@ export const coreRoutes: RouteConfig[] = [
     roles: ['ROLE_BGH'],
   },
   {
-    path: '/create-schedule',
+    path: '/create-schedule/:calendarReleaseId',
     component: CreateSchedule,
     title: 'Create Schedule',
     roles: ['ROLE_BGH'],
@@ -150,6 +156,18 @@ export const coreRoutes: RouteConfig[] = [
     component: FeeSign,
     title: 'Fee',
     roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/homework',
+    component: HwList,
+    title: 'Homework',
+    roles: ['ROLE_BGH', 'ROLE_GV'],
+  },
+  {
+    path: '/homework-details/:HomeworkId',
+    component: HwDetails,
+    title: 'Homework Details',
+    roles: ['ROLE_BGH', 'ROLE_GV'],
   },
   {
     path: '/profile',

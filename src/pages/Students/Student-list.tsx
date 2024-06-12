@@ -6,12 +6,14 @@ import {
   Modal,
   Radio,
   DatePicker,
-  message,
   notification,
+  Select,
+  Row,
+  Col,
 } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import mainAxios from '../../apis/main-axios';
-import { Student } from '../../types/response';
+import { SchoolYearClassData, Student } from '../../types/response';
 import teacherApi from '../../apis/urlApi';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
@@ -19,21 +21,27 @@ import axios from 'axios';
 
 export default function Students() {
   const [students, setStudents] = useState<Student[]>([]);
+  const [classes, setClasses] = useState<SchoolYearClassData[]>([]);
+  const [selectedClassId, setSelectedClassId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [form] = Form.useForm();
   const { idYear } = useContext(YearContext);
 
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchClass = async () => {
       if (idYear === null) return;
       setIsLoading(true);
       try {
-        const res = await teacherApi.getStudents(idYear);
-        setStudents(res?.data);
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        const classData = res?.data;
+        setClasses(classData);
+        if (classData.length > 0) {
+          setSelectedClassId(classData[0].id);
+        }
         setIsLoading(false);
       } catch (error: unknown) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
-          setStudents([]);
+          setClasses([]);
           setIsLoading(false);
         } else if (error instanceof Error) {
           console.error('Failed to fetch school year classes:', error.message);
@@ -42,10 +50,32 @@ export default function Students() {
         }
       }
     };
-    fetchStudents();
+    fetchClass();
   }, [idYear]);
 
-  // Hàm để mở modal
+  useEffect(() => {
+    const fetchStudentsByClass = async () => {
+      if (selectedClassId === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getStudentByClass(selectedClassId);
+        setStudents(res?.data);
+        setIsLoading(false);
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setStudents([]);
+          setIsLoading(false);
+        } else if (error instanceof Error) {
+          console.error('Failed to fetch students:', error.message);
+        } else {
+          console.error('An unknown error occurred.');
+        }
+      }
+    };
+    fetchStudentsByClass();
+  }, [selectedClassId]);
+
+  // Function to open the modal
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = () => {
@@ -58,19 +88,19 @@ export default function Students() {
 
   const handleSubmit = async () => {
     try {
-    const formData = await form.validateFields();
-     await mainAxios.post('/api/v1/student', formData);
+      const formData = await form.validateFields();
+      await mainAxios.post('/api/v1/student', formData);
       notification.success({
         message: 'Thành công',
-      })
+      });
       setIsModalOpen(false);
     } catch (error: any) {
       if (error.response.message) {
-        notification.error({ message: error.response.message})    
+        notification.error({ message: error.response.message });
       }
-     
     }
   };
+
   const renderStudentStatuses = (record: Student) => {
     return record.students.studentStatuses
       .map((status) => status.description)
@@ -79,9 +109,27 @@ export default function Students() {
 
   return (
     <div className="p-4 md:p-6 2xl:p-10">
-      <Button type="default" onClick={showModal} className="mb-4">
-        Thêm
-      </Button>
+      <Row className="mb-4">
+        <Col>
+          <Button type="default" onClick={showModal}>
+            Thêm
+          </Button>
+        </Col>
+        <Col className='ml-3'>
+          <Select
+            className='w-25'
+            placeholder='Lớp'
+            value={selectedClassId}
+            onChange={(value) => setSelectedClassId(value)}
+          >
+            {classes.map((cls) => (
+              <Select.Option key={cls.id} value={cls.id}>
+                {cls.className}
+              </Select.Option>
+            ))}
+          </Select>
+        </Col>
+      </Row>
       <Modal
         title="Thêm học sinh"
         open={isModalOpen}
@@ -104,7 +152,7 @@ export default function Students() {
             labelWrap
             wrapperCol={{ flex: 1 }}
             colon={false}
-            className='max-w-[600px] mx-auto'
+            className="max-w-[600px] mx-auto"
           >
             <Form.Item
               label="Họ:"
@@ -156,18 +204,25 @@ export default function Students() {
             >
               <Input />
             </Form.Item>
+
             <Form.Item
-              label="Năm:"
+              label="Lớp:"
               name="schoolYearClassId"
-              rules={[{ required: true, message: 'Please input!' }]}
+              rules={[{ required: true, message: 'Please select!' }]}
             >
-              <Input />
+              <Select>
+                {classes.map((cls) => (
+                  <Select.Option key={cls.id} value={cls.id}>
+                    {cls.className}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
           </Form>
         </div>
       </Modal>
 
-      {/* Bảng hiển thị danh sách học sinh */}
+      {/* Table displaying the list of students */}
       {isLoading ? (
         <Loader />
       ) : (

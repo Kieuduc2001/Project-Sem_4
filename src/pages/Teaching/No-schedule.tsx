@@ -1,9 +1,10 @@
-import { Button, Form, Input, Modal, DatePicker, message } from 'antd';
+import { Button, Form, Input, Modal, DatePicker, message, Select } from 'antd';
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import { useNavigate } from 'react-router-dom';
 import mainAxios from '../../apis/main-axios';
+
+const { Option } = Select;
 
 const NoTimetable: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,11 +27,12 @@ const NoTimetable: React.FC = () => {
                 title: values.className,
                 schoolYearId: idYear,
                 releaseAt: values.releaseAt.format(),
+                sem: values.sem,
             };
             await mainAxios.post('/api/v1/schedule/create-calendar-release', postData);
             message.success('Thời khóa biểu đã được tạo thành công');
             setIsModalOpen(false);
-            navigate('/create-schedule')
+            navigate('/create-schedule');
         } catch (error) {
             console.error('Failed to submit form:', error);
             message.error('Có lỗi xảy ra khi tạo thời khóa biểu');
@@ -86,6 +88,16 @@ const NoTimetable: React.FC = () => {
                         rules={[{ required: true, message: 'Vui lòng chọn ngày áp dụng!' }]}
                     >
                         <DatePicker className='w-full' showTime />
+                    </Form.Item>
+                    <Form.Item
+                        label="Học kỳ"
+                        name="sem"
+                        rules={[{ required: true, message: 'Vui lòng chọn học kỳ!' }]}
+                    >
+                        <Select>
+                            <Option value="HOC_KI_1">Học Kỳ 1</Option>
+                            <Option value="HOC_KI_2">Học Kỳ 2</Option>
+                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>

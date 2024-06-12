@@ -35,7 +35,6 @@ const Timetable: React.FC = () => {
           const firstClassId = releases[0].schedules?.[0]?.schoolYearClassId || null;
           setClassId(firstClassId);
         } else {
-          // Handle case when no data is found
           setSelectedCalendarReleaseId(null);
           setClassId(null);
         }
@@ -59,7 +58,7 @@ const Timetable: React.FC = () => {
 
   const handleCalendarReleaseChange = (value: number) => {
     setSelectedCalendarReleaseId(value);
-    setClassId(null); // Reset classId when calendar release changes
+    setClassId(null);
     const selectedRelease = calendarReleases.find(cr => cr.id === value);
     if (selectedRelease) {
       const firstClassId = selectedRelease.schedules[0]?.schoolYearClassId || null;
@@ -86,13 +85,13 @@ const Timetable: React.FC = () => {
   const transformScheduleData = (schedules: CalendarRelease['schedules'], studyTime: 'SANG' | 'CHIEU'): any[] => {
     const transformedData: any[] = [];
     const days: Day[] = ['T2', 'T3', 'T4', 'T5', 'T6'];
-    const startIndex = studyTime === 'SANG' ? 1 : 5; // Starting indexLesson for morning and afternoon
+    const startIndex = studyTime === 'SANG' ? 1 : 5;
 
     for (let i = 1; i <= 4; i++) {
-      const row: any = { indexLesson: `<b>Tiết ${startIndex + i - 1}</b>` }; // Adjusted indexLesson display
+      const row: any = { indexLesson: `<b>Tiết ${startIndex + i - 1}</b>` };
       days.forEach(day => {
         const lesson = schedules.find(schedule => schedule.indexLesson === startIndex + i - 1 && schedule.studyTime === studyTime && schedule.dayOfWeek === day);
-        row[day.toLowerCase()] = lesson ? `<b>${lesson.subjectName}</b><br />(${lesson.teacherName})` : '';
+        row[day.toLowerCase()] = lesson ? `<b>${lesson.subjectName}</b>` : '';
       });
       transformedData.push(row);
     }
@@ -105,7 +104,7 @@ const Timetable: React.FC = () => {
       title: 'Lịch',
       dataIndex: 'indexLesson',
       key: 'indexLesson',
-      width: 50, // Set a fixed width of 50px for the 'Lịch' column
+      width: 50,
       align: 'center' as 'center',
       render: (text: string, record: any, index: number) => (
         <div dangerouslySetInnerHTML={{ __html: `<b>Tiết ${index + 1}</b>` }} />
@@ -148,8 +147,8 @@ const Timetable: React.FC = () => {
     },
   ];
 
-  const morningColumns = columns.map(column => ({ ...column, width: '1/6' })); // Set equal width for each column for morning table
-  const afternoonColumns = columns.map(column => ({ ...column, width: '1/6' })); // Set equal width for each column for afternoon table
+  const morningColumns = columns.map(column => ({ ...column, width: '1/6' }));
+  const afternoonColumns = columns.map(column => ({ ...column, width: '1/6' }));
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -166,15 +165,16 @@ const Timetable: React.FC = () => {
         title: values.className,
         schoolYearId: idYear,
         releaseAt: values.releaseAt.format(),
+        sem: values.sem,
       };
 
       const response = await mainAxios.post('/api/v1/schedule/create-calendar-release', postData);
 
-      if (response.status === 200) {
-        const { id: calendarReleaseId } = response.data; // Save the created calendar release ID
+      if (response.status === 201) {
+        const { id: calendarReleaseId } = response.data;
         message.success('Thời khóa biểu đã được tạo thành công');
         setIsModalVisible(false);
-        navigate(`/create-schedule/${calendarReleaseId}`); // Redirect to create-schedule page with the calendar release ID
+        navigate(`/create-schedule/${calendarReleaseId}`);
       } else {
         message.error('Có lỗi xảy ra khi tạo thời khóa biểu');
       }
@@ -183,7 +183,6 @@ const Timetable: React.FC = () => {
       message.error('Có lỗi xảy ra khi tạo thời khóa biểu');
     }
   };
-
 
   if (isLoading) {
     return <Loader />;
@@ -248,7 +247,7 @@ const Timetable: React.FC = () => {
         <>
           <h2 className="mb-3 text-lg">Buổi sáng</h2>
           <Table
-            columns={morningColumns} // Use the adjusted columns for the morning table
+            columns={morningColumns}
             dataSource={morningData}
             pagination={false}
             bordered
@@ -257,7 +256,7 @@ const Timetable: React.FC = () => {
 
           <h2 className="mb-3 mt-3 text-lg">Buổi chiều</h2>
           <Table
-            columns={afternoonColumns} // Use the adjusted columns for the afternoon table
+            columns={afternoonColumns}
             dataSource={afternoonData}
             pagination={false}
             bordered
@@ -302,6 +301,16 @@ const Timetable: React.FC = () => {
             rules={[{ required: true, message: 'Vui lòng chọn ngày áp dụng!' }]}
           >
             <DatePicker className="w-full" showTime />
+          </Form.Item>
+          <Form.Item
+            label="Học kỳ"
+            name="sem"
+            rules={[{ required: true, message: 'Vui lòng chọn học kỳ!' }]}
+          >
+            <Select placeholder="Chọn học kỳ">
+              <Option value="HOC_KI_1">Học kỳ 1</Option>
+              <Option value="HOC_KI_2">Học kỳ 2</Option>
+            </Select>
           </Form.Item>
         </Form>
       </Modal>
