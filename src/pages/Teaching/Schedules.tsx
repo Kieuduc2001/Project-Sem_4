@@ -104,7 +104,7 @@ const Timetable: React.FC = () => {
       title: 'Lịch',
       dataIndex: 'indexLesson',
       key: 'indexLesson',
-      width: 50,
+      width: '10%',
       align: 'center' as 'center',
       render: (text: string, record: any, index: number) => (
         <div dangerouslySetInnerHTML={{ __html: `<b>Tiết ${index + 1}</b>` }} />
@@ -114,6 +114,7 @@ const Timetable: React.FC = () => {
       title: 'Thứ 2',
       dataIndex: 't2',
       key: 't2',
+      width: '18%',
       align: 'center' as 'center',
       render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
     },
@@ -121,6 +122,7 @@ const Timetable: React.FC = () => {
       title: 'Thứ 3',
       dataIndex: 't3',
       key: 't3',
+      width: '18%',
       align: 'center' as 'center',
       render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
     },
@@ -128,6 +130,7 @@ const Timetable: React.FC = () => {
       title: 'Thứ 4',
       dataIndex: 't4',
       key: 't4',
+      width: '18%',
       align: 'center' as 'center',
       render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
     },
@@ -135,6 +138,7 @@ const Timetable: React.FC = () => {
       title: 'Thứ 5',
       dataIndex: 't5',
       key: 't5',
+      width: '18%',
       align: 'center' as 'center',
       render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
     },
@@ -142,6 +146,7 @@ const Timetable: React.FC = () => {
       title: 'Thứ 6',
       dataIndex: 't6',
       key: 't6',
+      width: '18%',
       align: 'center' as 'center',
       render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
     },

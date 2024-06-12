@@ -217,7 +217,7 @@ const App = () => {
                             }}
                         >
                             <Modal
-                                title="Create Collection Period"
+                                title="Tạo đợt thu"
                                 visible={isModalVisible}
                                 onCancel={handleCancel}
                                 footer={[
@@ -242,6 +242,7 @@ const App = () => {
                                         label="Tên đợt thu"
                                         name="title"
                                         rules={[{ required: true, message: 'Please input the title!' }]}
+                                        className='mt-5'
                                     >
                                         <Input />
                                     </Form.Item>
