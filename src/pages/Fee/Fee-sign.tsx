@@ -18,8 +18,8 @@ import axios from 'axios';
 
 const { Sider, Content } = Layout;
 
-export default function FeeCollection() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+const App = () => {
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
     const [isLoading, setIsLoading] = useState(false);
     const { idYear } = useContext(YearContext);
@@ -95,11 +95,11 @@ export default function FeeCollection() {
     }, [idYear]);
 
     const showModal = () => {
-        setIsModalOpen(true);
+        setIsModalVisible(true);
     };
 
     const handleCancel = () => {
-        setIsModalOpen(false);
+        setIsModalVisible(false);
     };
 
     const handleSubmit = async () => {
@@ -130,7 +130,7 @@ export default function FeeCollection() {
 
             console.log('Post data:', postData);
             await teacherApi.postFeePeriod(postData);
-            setIsModalOpen(false);
+            setIsModalVisible(false);
 
             // // Refresh data after submission
             // const res = await teacherApi.getFeePeriod(idYear);
@@ -164,8 +164,8 @@ export default function FeeCollection() {
         },
         {
             title: 'Số còn phải thu',
-            dataIndex: 'amountDue',
-            key: 'amountDue',
+            dataIndex: '',
+            key: '',
         },
         {
             title: 'Thông báo',
@@ -218,7 +218,7 @@ export default function FeeCollection() {
                         >
                             <Modal
                                 title="Create Collection Period"
-                                visible={isModalOpen}
+                                visible={isModalVisible}
                                 onCancel={handleCancel}
                                 footer={[
                                     <Button key="back" onClick={handleCancel}>
@@ -318,4 +318,6 @@ export default function FeeCollection() {
             )}
         </div>
     );
-}
+};
+
+export default App;
