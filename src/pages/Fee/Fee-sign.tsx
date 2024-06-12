@@ -168,7 +168,7 @@ const App = () => {
             key: '',
         },
         {
-            title: 'Thông báo',
+            title: 'Nội dung',
             dataIndex: 'content',
             key: 'content',
             render: (content: string | null) => content || '-',

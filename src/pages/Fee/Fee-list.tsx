@@ -12,9 +12,7 @@ import {
     Select
 } from 'antd';
 import teacherApi from '../../apis/urlApi';
-import {
-    FeeList,
-} from '../../types/response';
+import { FeeList } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
 import axios from 'axios';
@@ -109,12 +107,11 @@ export default function SchoolYearClass() {
             } catch (error) {
                 console.error('Error fetching grade:', error);
             } finally {
-                setIsLoading(false)
+                setIsLoading(false);
             }
         };
         fetchGrades();
     }, []);
-
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -156,6 +153,14 @@ export default function SchoolYearClass() {
             message.error('Failed to submit data. Please try again later.');
         }
     };
+
+    const gradeMap = {
+        1: "Khối 1",
+        2: "Khối 2",
+        3: "Khối 3",
+        4: "Khối 4",
+        5: "Khối 5",
+    } as { [key: number]: string };
 
     return (
         <div className="p-4 md:p-6 2xl:p-10">
@@ -318,19 +323,57 @@ export default function SchoolYearClass() {
             ) : (
                 <div>
                     <Row justify="space-between" className="mb-6">
-                        <Table dataSource={fee} rowKey={(record) => (record.id !== undefined ? record.id : `temp-key-${record.title}`)} scroll={{ y: 450 }} className="w-full">
+                        <Table
+                            dataSource={fee}
+                            rowKey={(record) => (record.id !== undefined ? record.id : `temp-key-${record.title}`)}
+                            scroll={{ y: 450 }}
+                            className="w-full"
+                        >
                             <Table.Column title="Tên khoản thu" dataIndex="title" />
-                            <Table.Column
-                                title="Đơn giá"
-                                dataIndex="feePrices"
-                                render={(feePrices: FeePrice[]) =>
-                                    feePrices.map((price: FeePrice, index: number) => (
-                                        <div key={index}>
-                                            {price.price}/{price.unit.name}
-                                        </div>
-                                    ))
-                                }
-                            />
+                            <Table.ColumnGroup title="Đơn giá">
+                                <Table.Column
+                                    title="Giá"
+                                    dataIndex="feePrices"
+                                    key="price"
+                                    render={(feePrices: FeePrice[]) => (
+                                        <>
+                                            {feePrices.map((price: FeePrice, index: number) => (
+                                                <div className='mb-1 mt-1 border-b-2 border-bodydark1' key={index}>
+                                                    {price.price}
+                                                </div>
+                                            ))}
+                                        </>
+                                    )}
+                                />
+                                <Table.Column
+                                    title="Đơn vị"
+                                    dataIndex="feePrices"
+                                    key="unit"
+                                    render={(feePrices: FeePrice[]) => (
+                                        <>
+                                            {feePrices.map((price: FeePrice, index: number) => (
+                                                <div className='mb-1 mt-1 border-b-2 border-bodydark1' key={index}>
+                                                    {price.unit.name}
+                                                </div>
+                                            ))}
+                                        </>
+                                    )}
+                                />
+                                <Table.Column
+                                    title="Khối"
+                                    dataIndex="feePrices"
+                                    key="gradeId"
+                                    render={(feePrices: FeePrice[]) => (
+                                        <>
+                                            {feePrices.map((price: FeePrice, index: number) => (
+                                                <div className='mb-1 mt-1 border-b-2 border-bodydark1' key={index}>
+                                                    {gradeMap[price.gradeId] || price.gradeId}
+                                                </div>
+                                            ))}
+                                        </>
+                                    )}
+                                />
+                            </Table.ColumnGroup>
                             <Table.Column title="Kỳ thu" dataIndex="termName" />
                             <Table.Column
                                 title="Thời gian thu"

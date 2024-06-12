@@ -189,6 +189,12 @@ const Timetable: React.FC = () => {
     }
   };
 
+  const handleEditClick = () => {
+    if (selectedCalendarReleaseId) {
+      navigate(`/create-schedule/${selectedCalendarReleaseId}`);
+    }
+  };
+
   if (isLoading) {
     return <Loader />;
   }
@@ -239,7 +245,10 @@ const Timetable: React.FC = () => {
           </Row>
         </Col>
         <Col span={12} style={{ textAlign: 'right' }}>
-          <Button className="bg-bodydark2" type="primary" onClick={showModal}>
+          <Button className="bg-bodydark2" type="primary" onClick={handleEditClick}>
+            Chỉnh sửa
+          </Button>
+          <Button className="bg-bodydark2 ml-5" type="primary" onClick={showModal}>
             Tạo mới
           </Button>
           <Button className="ml-5" type="primary">

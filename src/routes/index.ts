@@ -30,6 +30,7 @@ const CreateCalendarRl = lazy(
 );
 const CreateSchedule = lazy(() => import('../pages/Teaching/Create-schedule'));
 const Schedule = lazy(() => import('../pages/Teaching/Schedules'));
+const EditSchedule = lazy(() => import('../pages/Teaching/Edit-schedule'));
 const TeachingAssign = lazy(
   () => import('../pages/Teaching/Teaching-assignment')
 );
@@ -116,6 +117,12 @@ export const coreRoutes: RouteConfig[] = [
     roles: ['ROLE_BGH'],
   },
   {
+    path: '/edit-schedule/:calendarReleaseId/:scheduleId',
+    component: EditSchedule,
+    title: 'Edit Schedule',
+    roles: ['ROLE_BGH'],
+  },
+  {
     path: '/no-schedule',
     component: NoSchedule,
     title: 'Schedule',
@@ -175,5 +182,6 @@ export const coreRoutes: RouteConfig[] = [
     title: 'Fee',
     roles: ['ROLE_BGH', 'ROLE_GV'],
   },
+
 ];
 export default coreRoutes;
