@@ -7,6 +7,7 @@ import { useAppDispatch } from '../../redux/hooks';
 import { setIsLogin } from '../../redux/slices/isLogin-slice';
 import { setLocalStorageItem } from '../../utils/storage/local-storage';
 import { Icon } from '../../icon/icon';
+// import Logo from '../images/logo';
 const SignIn = () => {
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
@@ -15,6 +16,7 @@ const SignIn = () => {
   const handleLogin = async (values: any) => {
     try {
       const response = await mainAxios.post('/api/v1/auth/login', values)
+      console.log(response);
       setCookie(Storage.token, response?.data?.authResponse.token)
       setCookie(Storage.refresh_token, response?.data?.authResponse?.refresh_token)
       dispatch(setIsLogin(response?.data))
@@ -36,8 +38,8 @@ const SignIn = () => {
         {/* Logo */}
         <div className="hidden w-full xl:block xl:w-1/2">
           <div className="py-17.5 px-26 text-center">
-            <img className="hidden dark:block" src="http://www.schooladmin.io/images/main-logo.png" alt="Logo" />
-            <img className="dark:hidden" src="http://www.schooladmin.io/images/main-logo.png" alt="Logo" />
+            {/* <img className="hidden dark:block" src="," alt="Logo" />
+            <img className="dark:hidden" src="Logo" alt="Logo" /> */}
 
             <p className="2xl:px-20">Cùng Trải Nghiệm Thống</p>
             <span className="inline-block mt-15">
