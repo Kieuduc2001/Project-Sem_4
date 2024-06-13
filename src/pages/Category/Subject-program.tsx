@@ -10,7 +10,6 @@ import {
     Select,
     Input,
 } from 'antd';
-import axios from 'axios';
 import mainAxios from '../../apis/main-axios';
 import teacherApi from '../../apis/urlApi';
 import {
@@ -33,38 +32,42 @@ export default function SchoolProgram() {
     const { idYear } = useContext(YearContext);
     const [isLoading, setIsLoading] = React.useState(true);
 
-    const [defaultGradeId, setDefaultGradeId] = useState<number | undefined>();
+    const [selectedGradeId, setSelectedGradeId] = useState<number | undefined>();
 
     useEffect(() => {
         fetchGrades();
     }, []);
 
     useEffect(() => {
-        if (defaultGradeId !== undefined) {
-            fetchData(defaultGradeId);
+        if (selectedGradeId !== undefined) {
+            fetchData(selectedGradeId);
         }
-    }, [defaultGradeId]);
+    }, [selectedGradeId]);
 
-    const fetchData = async(value: number) => {
-        try{
-            const res  = await mainAxios.get(`/api/v1/school/school-year-subject-grade?gradeId=${value}`)
+    const fetchData = async (value: number) => {
+        try {
+            const res = await mainAxios.get(`/api/v1/school/school-year-subject-grade?gradeId=${value}`)
             setSchoolProgram(res.data);
-        }catch(error)  {
-  console.error('Error fetching data:', error);
-            };
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        };
     };
 
-    const fetchGrades = async() => {
-        try{
-            const res =  await teacherApi.getGrades();
-            setGrades(res.data.body);
-            if (grades.length > 0) {
-                setDefaultGradeId(grades[0].id);
+    const fetchGrades = async () => {
+        try {
+            const res = await teacherApi.getGrades();
+            const gradeList = res.data.body;
+            setGrades(gradeList);
+            if (gradeList.length > 0) {
+                const defaultGrade = gradeList[0].id;
+                setSelectedGradeId(defaultGrade);
+                fetchData(defaultGrade); // Fetch data for the default grade
             }
         }
-        catch(error) {
-                console.error('Error fetching grades:', error);
-            };
+        catch (error) {
+            console.error('Error fetching grades:', error);
+        };
+
     };
 
     useEffect(() => {
@@ -101,6 +104,11 @@ export default function SchoolProgram() {
 
             setIsModalOpen(false);
             message.success('Thành Công');
+
+            if (selectedGradeId !== undefined) {
+                fetchData(selectedGradeId); // Fetch data again to refresh the table
+            }
+
         } catch (error: any) {
             if (error.response) {
                 console.error('Server Error:', error.response.data);
@@ -114,7 +122,7 @@ export default function SchoolProgram() {
     };
 
     const handleChangeGrade = (value: number) => {
-        fetchData(value);
+        setSelectedGradeId(value);
     };
 
     return (
@@ -128,7 +136,7 @@ export default function SchoolProgram() {
                             <Select
                                 className="w-30"
                                 onChange={handleChangeGrade}
-                                defaultValue={1}
+                                value={selectedGradeId}
                             >
                                 {grades.map((grade) => (
                                     <Select.Option key={grade.id} value={grade.id}>
@@ -236,7 +244,7 @@ export default function SchoolProgram() {
                         <Table.Column title="Số tiết" dataIndex="number" />
                     </Table>
                 </div>
-            )};
+            )}
         </div>
     );
 }
