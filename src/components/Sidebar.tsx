@@ -224,6 +224,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
+      
 
 
                         <i className=" fa-solid fa-list"></i>
@@ -448,8 +449,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
                         <i className=" fa-solid fa-hand-point-up"></i>
-                        Hệ thống
 
+                        Hệ thống
+                
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div

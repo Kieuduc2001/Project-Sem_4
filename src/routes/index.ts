@@ -40,6 +40,7 @@ const Acknowledge = lazy(() => import('../pages/Acknowledge'));
 const Evaluate = lazy(() => import('../pages/Evaluate'));
 
 const FeeSign = lazy(() => import('../pages/Fee/Fee-sign'))
+
 const FeeList = lazy(() => import('../pages/Fee/Fee-list'));
 
 export const coreRoutes: RouteConfig[] = [
