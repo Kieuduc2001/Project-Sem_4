@@ -57,10 +57,9 @@ export default function SchoolYearClass() {
             const formData = await form.validateFields();
 
             formData['schoolYear'] = idYear;
-            const res = await teacherApi.postCreateSchoolYearClass(formData);
+             await teacherApi.postCreateSchoolYearClass(formData);
 
             setIsModalOpen(false);
-            // fetchData();
             message.success('Data submitted successfully!');
         } catch (error: any) {
             if (error.response) {
