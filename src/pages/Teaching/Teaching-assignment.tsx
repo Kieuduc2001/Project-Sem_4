@@ -26,7 +26,7 @@ const AssignmentForm: React.FC = () => {
         const res = await teacherApi.getTeacherSchoolYearClassSubject(idYear);
         setTeacherClassSubject(res?.data);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 2000) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
           setTeacherClassSubject([]);
         } else {
           console.error('Failed to fetch school year classes:', error);
@@ -46,7 +46,11 @@ const AssignmentForm: React.FC = () => {
         const res = await teacherApi.getSchoolYearClass(idYear);
         setClasses(res?.data);
       } catch (error) {
-        console.error('Failed to fetch classes:', error);
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setClasses([]);
+        } else {
+          console.error('Failed to fetch school year classes:', error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -62,7 +66,11 @@ const AssignmentForm: React.FC = () => {
         const res = await teacherApi.getSchoolYearSubject(idYear);
         setSubjects(res?.data);
       } catch (error) {
-        console.error('Failed to fetch subjects:', error);
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setSubjects([]);
+        } else {
+          console.error('Failed to fetch school year classes:', error);
+        }
       } finally {
         setIsLoading(false);
       }

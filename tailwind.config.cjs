@@ -45,6 +45,7 @@ module.exports = {
       danger: '#D34053',
       warning: '#FFA70B',
       blue: '#1890ff',
+      'gray-4': '#7b8898',
     },
     screens: {
       '2xsm': '375px',
