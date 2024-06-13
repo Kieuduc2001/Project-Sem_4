@@ -35,7 +35,6 @@ const Timetable: React.FC = () => {
           const firstClassId = releases[0].schedules?.[0]?.schoolYearClassId || null;
           setClassId(firstClassId);
         } else {
-          // Handle case when no data is found
           setSelectedCalendarReleaseId(null);
           setClassId(null);
         }
@@ -171,7 +170,7 @@ const Timetable: React.FC = () => {
       const response = await mainAxios.post('/api/v1/schedule/create-calendar-release', postData);
 
       if (response.status === 200) {
-        const { id: calendarReleaseId } = response.data; // Save the created calendar release ID
+        const { id: calendarReleaseId } = response.data; 
         message.success('Thời khóa biểu đã được tạo thành công');
         setIsModalVisible(false);
         navigate(`/create-schedule/${calendarReleaseId}`); // Redirect to create-schedule page with the calendar release ID
@@ -248,7 +247,7 @@ const Timetable: React.FC = () => {
         <>
           <h2 className="mb-3 text-lg">Buổi sáng</h2>
           <Table
-            columns={morningColumns} // Use the adjusted columns for the morning table
+            columns={morningColumns} 
             dataSource={morningData}
             pagination={false}
             bordered
@@ -257,7 +256,7 @@ const Timetable: React.FC = () => {
 
           <h2 className="mb-3 mt-3 text-lg">Buổi chiều</h2>
           <Table
-            columns={afternoonColumns} // Use the adjusted columns for the afternoon table
+            columns={afternoonColumns} 
             dataSource={afternoonData}
             pagination={false}
             bordered
