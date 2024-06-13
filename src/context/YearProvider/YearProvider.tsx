@@ -15,7 +15,7 @@ import { getCookie } from '../../utils/storage//cookie-storage';
 export type YearContextType = {
   idYear: number | null;
   setIdYear: (year: number | null) => void;
-  schoolYears: any[]; // Consider specifying
+  schoolYears: any[]; 
 };
 
 export const YearContext = createContext<YearContextType>({
@@ -31,7 +31,7 @@ interface Props {
 const YearProvider: React.FC<Props> = ({ children }) => {
   const [idYear, setIdYear] = useState<any>(() => {
     const storedYear = getLocalStorageItem(Storage.idYear);
-    return storedYear ? parseInt(storedYear, 10) : 0;
+    return storedYear ? parseInt(storedYear, 10) : '';
   });
   const [schoolYears, setSchoolYears] = useState<any[]>([]);
   const token = getCookie('token')

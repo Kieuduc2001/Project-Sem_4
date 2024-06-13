@@ -15,7 +15,7 @@ import { TeacherClassSubjectData } from '../../types/response';
 import Loader from '../../common/Loader';
 import axios from 'axios';
 
-const App: React.FC = () => {
+const TeachingAssign: React.FC = () => {
   const [teacherClassSubject, setTeacherClassSubject] = useState<TeacherClassSubjectData[]>([]);
   const { idYear } = useContext(YearContext);
   const [isLoading, setIsLoading] = useState(true);
@@ -123,4 +123,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App; 
+export default TeachingAssign; 
