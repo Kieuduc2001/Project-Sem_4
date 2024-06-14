@@ -108,6 +108,7 @@ const Header = (props: {
             <Select
               className="w-[130px] h-10"
               options={optionsYear}
+              
               value={idYear}
               onChange={handleChange}
             />
