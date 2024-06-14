@@ -95,6 +95,22 @@ const Attendences = () => {
     fetchSchoolYearClassData();
   }, [idYear]);
 
+  useEffect(() => {
+    const fetchSchoolYearClassData = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch school year class data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSchoolYearClassData();
+  }, [idYear]);
+
   const handleChange = (value: number) => {
     setClassId(value);
   };
