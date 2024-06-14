@@ -44,7 +44,7 @@ const DropdownUser = () => {
     deleteAllCookies()
     navigate('/sign-in')
     notification.success({
-      message: 'Logout success',
+      message: 'Đăng Xuất Thành Công',
     })
   }
   return (
@@ -114,10 +114,10 @@ const DropdownUser = () => {
                   fill=""
                 />
               </svg>
-              My Profile
+             Trang Cá Nhân
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to="#"
               className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
@@ -135,9 +135,9 @@ const DropdownUser = () => {
                   fill=""
                 />
               </svg>
-              My Contacts
+             
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               to="/settings"
@@ -160,7 +160,7 @@ const DropdownUser = () => {
                   fill=""
                 />
               </svg>
-              Account Settings
+             Cài Đặt
             </Link>
           </li>
         </ul>
@@ -185,7 +185,7 @@ const DropdownUser = () => {
               fill=""
             />
           </svg>
-          Log Out
+         Đăng Xuất
         </button>
       </div>
       {/* <!-- Dropdown End --> */}

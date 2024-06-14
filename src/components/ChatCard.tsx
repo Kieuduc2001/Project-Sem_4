@@ -7,9 +7,9 @@ import UserFive from '../images/user/user-05.png';
 
 const ChatCard = () => {
   return (
-    <div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-4">
+    <div className="col-span-12 rounded-sm border border-stroke bg-white py-6 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-12">
       <h4 className="mb-6 px-7.5 text-xl font-semibold text-black dark:text-white">
-        Chats
+       Giáo Viên
       </h4>
 
       <div>
@@ -25,18 +25,19 @@ const ChatCard = () => {
           <div className="flex flex-1 items-center justify-between">
             <div>
               <h5 className="font-medium text-black dark:text-white">
-                Devid Heilo
+                Trần Thái Thông
               </h5>
               <p>
                 <span className="text-sm text-black dark:text-white">
-                  Hello, how are you?
+                  SĐT:
+
                 </span>
-                <span className="text-xs"> . 12 min</span>
+                <span className="text-sm">0345666666</span>
               </p>
             </div>
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary">
+            {/* <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary">
               <span className="text-sm font-medium text-white">3</span>
-            </div>
+            </div> */}
           </div>
         </Link>
         <Link
@@ -50,10 +51,10 @@ const ChatCard = () => {
 
           <div className="flex flex-1 items-center justify-between">
             <div>
-              <h5 className="font-medium">Henry Fisher</h5>
+              <h5 className="font-medium">Võ Thị Sáu</h5>
               <p>
-                <span className="text-sm">I am waiting for you</span>
-                <span className="text-xs"> . 5:54 PM</span>
+                <span className="text-sm">SĐT:</span>
+                <span className="text-xs"> 0987654386</span>
               </p>
             </div>
           </div>
@@ -69,10 +70,10 @@ const ChatCard = () => {
 
           <div className="flex flex-1 items-center justify-between">
             <div>
-              <h5 className="font-medium">Wilium Smith</h5>
+              <h5 className="font-medium">Trần Quốc Toản</h5>
               <p>
-                <span className="text-sm">Where are you now?</span>
-                <span className="text-xs"> . 10:12 PM</span>
+                <span className="text-sm">SĐT:</span>
+                <span className="text-xs">098799999</span>
               </p>
             </div>
           </div>
@@ -89,58 +90,19 @@ const ChatCard = () => {
           <div className="flex flex-1 items-center justify-between">
             <div>
               <h5 className="font-medium text-black dark:text-white">
-                Henry Deco
+                Tôn Thất Thuyết
               </h5>
               <p>
                 <span className="text-sm text-black dark:text-white">
-                  Thank you so much!
+                  SĐT:
                 </span>
-                <span className="text-xs"> . Sun</span>
+                <span className="text-xs">0986838383</span>
               </p>
             </div>
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary">
-              <span className="text-sm font-medium text-white">2</span>
-            </div>
+           
           </div>
         </Link>
-        <Link
-          to="/"
-          className="flex items-center gap-5 py-3 px-7.5 hover:bg-gray-3 dark:hover:bg-meta-4"
-        >
-          <div className="relative h-14 w-14 rounded-full">
-            <img src={UserTwo} alt="User" />
-            <span className="absolute right-0 bottom-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-meta-7"></span>
-          </div>
-
-          <div className="flex flex-1 items-center justify-between">
-            <div>
-              <h5 className="font-medium">Jubin Jack</h5>
-              <p>
-                <span className="text-sm">I really love that!</span>
-                <span className="text-xs"> . Oct 23</span>
-              </p>
-            </div>
-          </div>
-        </Link>
-        <Link
-          to="/"
-          className="flex items-center gap-5 py-3 px-7.5 hover:bg-gray-3 dark:hover:bg-meta-4"
-        >
-          <div className="relative h-14 w-14 rounded-full">
-            <img src={UserFive} alt="User" />
-            <span className="absolute right-0 bottom-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-meta-6"></span>
-          </div>
-
-          <div className="flex flex-1 items-center justify-between">
-            <div>
-              <h5 className="font-medium">Wilium Smith</h5>
-              <p>
-                <span className="text-sm">Where are you now?</span>
-                <span className="text-xs"> . Sep 20</span>
-              </p>
-            </div>
-          </div>
-        </Link>
+      
       </div>
     </div>
   );

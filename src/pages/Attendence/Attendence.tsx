@@ -47,7 +47,6 @@ const Attendences = () => {
       //     return acc;
       //   }
         
-
         
       // }, {});
       // setAttendanceStatus(initialStatus);
@@ -65,7 +64,7 @@ const Attendences = () => {
         const res = await teacherApi.getSchoolYearClass(idYear);
         setSchoolYearClass(res?.data);
       } catch (error) {
-        console.error('Failed to fetch school year class data:', error);
+        console.error('Failed to fetch school year class data:', error);      
       } finally {
         setIsLoading(false);
       }
@@ -79,6 +78,22 @@ const Attendences = () => {
 
     setAttendenceData(res.data);
   }
+
+  useEffect(() => {
+    const fetchSchoolYearClassData = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch school year class data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSchoolYearClassData();
+  }, [idYear]);
 
   const handleChange = (value: number) => {
     setClassId(value);

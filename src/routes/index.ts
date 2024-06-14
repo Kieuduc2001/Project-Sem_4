@@ -1,3 +1,4 @@
+import Students from '../pages/Students/Student-list';
 import { FC, LazyExoticComponent, lazy } from 'react';
 
 type LazyComponent = LazyExoticComponent<FC<any>>;
@@ -23,7 +24,7 @@ const SchoolYearTeacher = lazy(
   () => import('../pages/Category/Teacher-school-year')
 );
 const SubjectProgram = lazy(() => import('../pages/Category/Subject-program'));
-// const Profile = lazy(() => import('../pages/Profile'));
+const Profile = lazy(() => import('../pages/Profile'));
 const NoSchedule = lazy(() => import('../pages/Teaching/No-schedule'));
 const CreateCalendarRl = lazy(
   () => import('../pages/Teaching/calendar-release')
@@ -38,6 +39,9 @@ const AssignmentList = lazy(
 );
 const Acknowledge = lazy(() => import('../pages/Acknowledge'));
 const Evaluate = lazy(() => import('../pages/Evaluate'));
+
+const FeeSign = lazy(() => import('../pages/Fee/Fee-sign'))
+
 const FeeList = lazy(() => import('../pages/Fee/Fee-list'));
 
 export const coreRoutes: RouteConfig[] = [
@@ -142,6 +146,18 @@ export const coreRoutes: RouteConfig[] = [
     component: FeeList,
     title: 'Fee',
     roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/fee-sign',
+    component: FeeSign,
+    title: 'Fee',
+    roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/profile',
+    component: Profile,
+    title: 'Fee',
+    roles: ['ROLE_BGH', 'ROLE_GV'],
   },
 ];
 export default coreRoutes;

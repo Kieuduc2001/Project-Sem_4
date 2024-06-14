@@ -227,7 +227,6 @@ export interface DataTypeAttendence {
   Nghi_Co_Phep: JSX.Element;
   Nghi_Khong_Phep: JSX.Element;
   Trang_Thai: number;
-
 }
 
 export interface Student {
