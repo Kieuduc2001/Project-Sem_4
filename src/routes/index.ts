@@ -1,4 +1,3 @@
-import Students from '../pages/Students/Student-list';
 import { FC, LazyExoticComponent, lazy } from 'react';
 
 type LazyComponent = LazyExoticComponent<FC<any>>;

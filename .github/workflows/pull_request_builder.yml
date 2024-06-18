@@ -1,6 +1,10 @@
 name: GitHub Actions - Pull Request Builder
 
+
 on: pull_request
+
+env:
+  CI: true
 
 jobs:
   prod_build:
