@@ -25,6 +25,7 @@ const Attendences = () => {
   const [attendenceClass, setAttendenceClass] = useState('attendance-by-day');
   const [form] = Form.useForm();
   const [attendanceStatus, setAttendanceStatus] = useState<{ [key: string]: string }>({});
+
   const [attendanceData, setAttendenceData] = useState<AttendenceData[]>([])
   const [dayOff, setDayOff] = useState(dayjs());
   useEffect(() => {
@@ -84,6 +85,23 @@ const Attendences = () => {
       if (idYear === null) return;
       setIsLoading(true);
       try {
+
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch school year class data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSchoolYearClassData();
+  }, [idYear]);
+
+  useEffect(() => {
+    const fetchSchoolYearClassData = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
         const res = await teacherApi.getSchoolYearClass(idYear);
         setSchoolYearClass(res?.data);
       } catch (error) {
@@ -114,6 +132,7 @@ const Attendences = () => {
   const handleChange = (value: number) => {
     setClassId(value);
   };
+
   const handleChangeDay = (value:any) => {
     if (value) {
       form.setFieldValue("dayOff", value);
@@ -135,6 +154,7 @@ const Attendences = () => {
 
       if (type === 'CO_MAT') {
         newStatus[id] = prevState[id] === 'CO_MAT' ? '' : 'CO_MAT';
+
       } else if (type === 'NGHI_CO_PHEP') {
         newStatus[id] = prevState[id] === 'NGHI_CO_PHEP' ? '' : 'NGHI_CO_PHEP';
 
@@ -182,6 +202,7 @@ const Attendences = () => {
           onChange={() => handleCheckboxChange(record.key, 'CO_MAT')}
         />
       ),
+
     },
     {
       title: 'Nghỉ có phép',
@@ -204,6 +225,7 @@ const Attendences = () => {
       align: 'center',
       render: (_, record) => (
         <Checkbox
+
           checked={attendanceStatus[record.key] === 'NGHI_KHONG_PHEP'}
           onChange={() => handleCheckboxChange(record.key, 'NGHI_KHONG_PHEP')}
         />
@@ -240,6 +262,7 @@ const Attendences = () => {
       <Checkbox
         checked={attendanceStatus[data.id] === 'CO_MAT'}
         onChange={() => handleCheckboxChange(data.id, 'CO_MAT')}
+
       />
     ),
     Nghi_Co_Phep: (
@@ -250,6 +273,7 @@ const Attendences = () => {
     ),
     Nghi_Khong_Phep: (
       <Checkbox
+
         checked={attendanceStatus[data.id] === 'NGHI_KHONG_PHEP'}
         onChange={() => handleCheckboxChange(data.id, 'NGHI_KHONG_PHEP')}
       />
@@ -329,6 +353,7 @@ const Attendences = () => {
 
   const handleSubmit = async () => {
     try {
+
       const values = form.getFieldsValue();
       values["classId"] = classId,
         values["listStudent"] = Object.keys(attendanceStatus).map(studentId => ({
@@ -363,6 +388,7 @@ const Attendences = () => {
         </div>
       </div>
       <Form form={form}>
+
         <div className={`${attendenceClass !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
           <div style={{ display: 'flex', padding: '16px' }}>
             <Form.Item className="classId" style={{ marginRight: '14px' }}>

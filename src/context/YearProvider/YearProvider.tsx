@@ -31,6 +31,7 @@ interface Props {
 const YearProvider: React.FC<Props> = ({ children }) => {
   const [idYear, setIdYear] = useState<any>(() => {
     const storedYear = getLocalStorageItem(Storage.idYear);
+
     return storedYear ? parseInt(storedYear, 10) : '';
   });
   const [schoolYears, setSchoolYears] = useState<any[]>([]);

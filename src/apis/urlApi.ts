@@ -30,6 +30,10 @@ enum URL {
   GET_SCHEDULE_SUBJECTS = '/api/v1/schedule/get-teacher-class-subject',
   //Fee
   GET_FEE_LIST = '/api/v1/school-year-fee/getBy',
+  CREATE_FEE = '/api/v1/school-year-fee/create',
+  GET_FEE_PERIOD = '/api/v1/fee-period/getBy',
+  CREATE_FEE_PERIOD = '/api/v1/fee-period/create',
+  GET_SCOPES = '/api/v1/school-year-fee/getUnitScopePaymentMethod',
   GET_Attendence = '/api/v1/student/get-attendance'
 }
 
@@ -148,6 +152,43 @@ const teacherApi = {
   getFeeList: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_FEE_LIST}?schoolYearId=${id}`)
   },
+  postFeeList: (payload: {
+    title: string;
+    term: string;
+    compel: boolean;
+    status: boolean;
+    refund: boolean;
+    paymentTimeId: number;
+    schoolYearId: number;
+    feePriceList: {
+      price: number;
+      gradeId: number;
+      unitId: number;
+    }[];
+  }): Promise<IResponse<any>> => {
+    return mainAxios.post(URL.CREATE_FEE, payload);
+  },
+  getFeePeriod: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_FEE_PERIOD}?schoolYearId=${id}`);
+  },
+  getScope: (): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_SCOPES}`);
+  },
+  postFeePeriod: (payload: {
+    title: string;
+    content: string;
+    schoolYearId: number;
+    endDate: string;
+    feePeriodScope: {
+      objectIdList: number[];
+      scopeId: number;
+    };
+    schoolYearFeePeriodCreateList: {
+      amount: number;
+      schoolYearFeeId: number;
+    }[];
+  }): Promise<IResponse<any>> => {
+    return mainAxios.post(URL.CREATE_FEE_PERIOD, payload);
   getAttendence:(classId:number,dayOff:string):Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_Attendence}?date=${dayOff}&schoolYearClassId=${classId}`);
   },
