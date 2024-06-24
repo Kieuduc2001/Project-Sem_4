@@ -7,7 +7,11 @@ import {
   Radio,
   DatePicker,
   message,
+<<<<<<< HEAD
   Select,
+=======
+  notification,
+>>>>>>> 9bcb39d09395e0284bef4f69424d4247c2c7fe1a
 } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import mainAxios from '../../apis/main-axios';
@@ -79,25 +83,21 @@ export default function Students() {
 
   const handleSubmit = async () => {
     try {
-      const formData = await form.validateFields();
-
-      const res = await mainAxios.post('/api/v1/student', formData);
-
+    const formData = await form.validateFields();
+     await mainAxios.post('/api/v1/student', formData);
+      notification.success({
+        message: 'Thành công',
+      })
       setIsModalOpen(false);
       fetchStudents();
     } catch (error: any) {
-      if (error.response) {
-        console.error('Server Error:', error.response.data);
-      } else if (error.request) {
-        console.error('Network Error:', error.request);
-      } else {
-        console.error('Error:', error.message);
+      if (error.response.message) {
+        notification.error({ message: error.response.message})    
       }
-      message.error('Failed to submit data. Please try again later.');
+     
     }
   };
-
-  const renderStudentStatuses = (text: any, record: Student) => {
+  const renderStudentStatuses = (record: Student) => {
     return record.students.studentStatuses
       .map((status) => status.description)
       .join(', ');
@@ -114,10 +114,10 @@ export default function Students() {
         onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
-            Cancel
+            Huỷ
           </Button>,
           <Button key="submit" type="primary" onClick={handleSubmit}>
-            Submit
+            Gửi
           </Button>,
         ]}
       >
@@ -130,7 +130,7 @@ export default function Students() {
             labelWrap
             wrapperCol={{ flex: 1 }}
             colon={false}
-            style={{ maxWidth: 600 }}
+            className='max-w-[600px] mx-auto'
           >
             <Form.Item
               label="Họ:"
@@ -208,17 +208,17 @@ export default function Students() {
         <Table dataSource={students} rowKey="id">
           <Table.Column
             title="Mã học sinh"
-            render={(text, record: Student) => `${record.students.studentCode}`}
+            render={(_, record: Student) => `${record.students.studentCode}`}
           />
           <Table.Column
             title="Họ và tên"
-            render={(text, record: Student) =>
+            render={(_, record: Student) =>
               `${record.students.firstName} ${record.students.lastName}`
             }
           />
           <Table.Column
             title="Ngày sinh"
-            render={(text, record: Student) => {
+            render={(_, record: Student) => {
               const date = new Date(record.students.birthday);
               const day = String(date.getDate()).padStart(2, '0');
               const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
@@ -228,11 +228,11 @@ export default function Students() {
           />
           <Table.Column
             title="Giới tính"
-            render={(text, record: Student) => `${record.students.studentCode}`}
+            render={(_, record: Student) => `${record.students.studentCode}`}
           />
           <Table.Column
             title="Địa chỉ"
-            render={(text, record: Student) => `${record.students.address}`}
+            render={(_, record: Student) => `${record.students.address}`}
           />
           <Table.Column title="Trạng thái" render={renderStudentStatuses} />
         </Table>

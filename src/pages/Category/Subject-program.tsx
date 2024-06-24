@@ -10,7 +10,6 @@ import {
     Select,
     Input,
 } from 'antd';
-import axios from 'axios';
 import mainAxios from '../../apis/main-axios';
 import teacherApi from '../../apis/urlApi';
 import {
@@ -33,42 +32,42 @@ export default function SchoolProgram() {
     const { idYear } = useContext(YearContext);
     const [isLoading, setIsLoading] = React.useState(true);
 
-    const [defaultGradeId, setDefaultGradeId] = useState<number | undefined>();
+    const [selectedGradeId, setSelectedGradeId] = useState<number | undefined>();
 
     useEffect(() => {
         fetchGrades();
     }, []);
 
     useEffect(() => {
-        if (defaultGradeId !== undefined) {
-            fetchData(defaultGradeId);
+        if (selectedGradeId !== undefined) {
+            fetchData(selectedGradeId);
         }
-    }, [defaultGradeId]);
+    }, [selectedGradeId]);
 
-    const fetchData = (value: number) => {
-        mainAxios
-            .get(`/api/v1/school/school-year-subject-grade?gradeId=${value}`)
-            .then((response) => {
-                setSchoolProgram(response.data);
-            })
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-            });
+    const fetchData = async (value: number) => {
+        try {
+            const res = await mainAxios.get(`/api/v1/school/school-year-subject-grade?gradeId=${value}`)
+            setSchoolProgram(res.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        };
     };
 
-    const fetchGrades = () => {
-        teacherApi
-            .getGrades()
-            .then((response) => {
-                const gradesData = response.data.body;
-                setGrades(gradesData);
-                if (gradesData.length > 0) {
-                    setDefaultGradeId(gradesData[0].id);
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching grades:', error);
-            });
+    const fetchGrades = async () => {
+        try {
+            const res = await teacherApi.getGrades();
+            const gradeList = res.data.body;
+            setGrades(gradeList);
+            if (gradeList.length > 0) {
+                const defaultGrade = gradeList[0].id;
+                setSelectedGradeId(defaultGrade);
+                fetchData(defaultGrade); // Fetch data for the default grade
+            }
+        }
+        catch (error) {
+            console.error('Error fetching grades:', error);
+        };
+
     };
 
     useEffect(() => {
@@ -98,13 +97,18 @@ export default function SchoolProgram() {
     const handleSubmit = async () => {
         try {
             const formData = await form.validateFields();
-            const res = await mainAxios.post(
+            await mainAxios.post(
                 '/api/v1/school/creat-school-year-subject-grade',
                 formData
             );
 
             setIsModalOpen(false);
-            message.success('Data submitted successfully!');
+            message.success('Thành Công');
+
+            if (selectedGradeId !== undefined) {
+                fetchData(selectedGradeId); // Fetch data again to refresh the table
+            }
+
         } catch (error: any) {
             if (error.response) {
                 console.error('Server Error:', error.response.data);
@@ -118,7 +122,7 @@ export default function SchoolProgram() {
     };
 
     const handleChangeGrade = (value: number) => {
-        fetchData(value);
+        setSelectedGradeId(value);
     };
 
     return (
@@ -127,12 +131,12 @@ export default function SchoolProgram() {
                 <Loader />
             ) : (
                 <div>
-                    <Row style={{ marginBottom: '15px' }}>
+                    <Row className='mb-[15px]'>
                         <Col span={12}>
                             <Select
                                 className="w-30"
                                 onChange={handleChangeGrade}
-                                defaultValue={1}
+                                value={selectedGradeId}
                             >
                                 {grades.map((grade) => (
                                     <Select.Option key={grade.id} value={grade.id}>
@@ -240,7 +244,7 @@ export default function SchoolProgram() {
                         <Table.Column title="Số tiết" dataIndex="number" />
                     </Table>
                 </div>
-            )};
+            )}
         </div>
     );
 }
