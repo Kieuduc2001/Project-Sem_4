@@ -254,6 +254,7 @@ export default function FeeCollection() {
             title: 'Thông báo',
             dataIndex: 'notification',
             key: 'notification',
+
         },
     ];
 

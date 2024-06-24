@@ -35,7 +35,6 @@ const Timetable: React.FC = () => {
           const firstClassId = releases[0].schedules?.[0]?.schoolYearClassId || null;
           setClassId(firstClassId);
         } else {
-          // Handle case when no data is found
           setSelectedCalendarReleaseId(null);
           setClassId(null);
         }

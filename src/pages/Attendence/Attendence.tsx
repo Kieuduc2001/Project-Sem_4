@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import mainAxios from '../../apis/main-axios';
 import Loader from '../../common/Loader';
 import {
+  AttendenceData,
   DataTypeAttendence,
   SchoolYearClassData,
   Student,
@@ -12,42 +13,105 @@ import {
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import teacherApi from '../../apis/urlApi';
 import TextArea from 'antd/es/input/TextArea';
+import { data } from 'jquery';
 
 const { Option } = Select;
-
-type TableRowSelection<T> = TableProps<T>['rowSelection'];
-
 const Attendences = () => {
   const [student, setStudent] = useState<Student[]>([]);
   const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
   const { idYear } = useContext(YearContext);
-  const [classId, setClassId] = useState<number | null>(1);
+  const [classId, setClassId] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [attendence, setAttendence] = useState('attendance-by-day');
+  const [attendenceClass, setAttendenceClass] = useState('attendance-by-day');
   const [form] = Form.useForm();
   const [attendanceStatus, setAttendanceStatus] = useState<{ [key: string]: string }>({});
 
+  const [attendanceData, setAttendenceData] = useState<AttendenceData[]>([])
+  const [dayOff, setDayOff] = useState(dayjs());
   useEffect(() => {
-    const fetchStudents = async () => {
-      if (classId === null) return;
+    fetchStudents();
+    getAttendence();
+  }, [classId]);
+  const fetchStudents = async () => {
+    if (classId === null) return;
+    setIsLoading(true);
+    try {
+      const res = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
+      setStudent(res?.data);
+      // const initialStatus = res?.data.reduce((acc: any, student: any) => {
+      //   if(attendanceData){
+      //     attendanceData.map((data)=>{
+      //       return acc[data.studentInfo.studentYearInfoId] = data.attendanceStatus
+      //     })
+      //   }else{
+      //     acc[student.id] = "CO_MAT";
+      //     return acc;
+      //   }
+        
+        
+      // }, {});
+      // setAttendanceStatus(initialStatus);
+    } catch (error) {
+      console.error('Failed to fetch students:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
+    const fetchSchoolYearClassData = async () => {
+      if (idYear === null) return;
       setIsLoading(true);
       try {
-        const res = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
-        setStudent(res?.data);
-
-        const initialStatus = res?.data.reduce((acc: any, student: any) => {
-          acc[student.id] = 'CO_MAT';
-          return acc;
-        }, {});
-        setAttendanceStatus(initialStatus);
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data);
       } catch (error) {
-        console.error('Failed to fetch students:', error);
+        console.error('Failed to fetch school year class data:', error);      
       } finally {
         setIsLoading(false);
       }
     };
-    fetchStudents();
-  }, [classId]);
+    fetchSchoolYearClassData();
+  }, [idYear]);
+  const getAttendence = async () => {
+
+    const res = await teacherApi.getAttendence(classId,form.getFieldValue("dayOff")??dayOff);
+    console.log(res);
+
+    setAttendenceData(res.data);
+  }
+
+  useEffect(() => {
+    const fetchSchoolYearClassData = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch school year class data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSchoolYearClassData();
+  }, [idYear]);
+
+  useEffect(() => {
+    const fetchSchoolYearClassData = async () => {
+      if (idYear === null) return;
+      setIsLoading(true);
+      try {
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data);
+      } catch (error) {
+        console.error('Failed to fetch school year class data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchSchoolYearClassData();
+  }, [idYear]);
 
   useEffect(() => {
     const fetchSchoolYearClassData = async () => {
@@ -69,6 +133,13 @@ const Attendences = () => {
     setClassId(value);
   };
 
+  const handleChangeDay = (value:any) => {
+    if (value) {
+      form.setFieldValue("dayOff", value);
+      setDayOff(value);
+      getAttendence();
+    }
+  }
   const formatDate = (dateString: string) => {
     const dateObject = new Date(dateString);
     const day = String(dateObject.getDate()).padStart(2, '0');
@@ -83,8 +154,13 @@ const Attendences = () => {
 
       if (type === 'CO_MAT') {
         newStatus[id] = prevState[id] === 'CO_MAT' ? '' : 'CO_MAT';
-      } else {
-        newStatus[id] = prevState[id] === 'NGHI_HOC' ? '' : 'NGHI_HOC';
+
+      } else if (type === 'NGHI_CO_PHEP') {
+        newStatus[id] = prevState[id] === 'NGHI_CO_PHEP' ? '' : 'NGHI_CO_PHEP';
+
+      }
+      else {
+        newStatus[id] = prevState[id] === 'NGHI_KHONG_PHEP' ? '' : 'NGHI_KHONG_PHEP';
       }
 
       return newStatus;
@@ -126,17 +202,32 @@ const Attendences = () => {
           onChange={() => handleCheckboxChange(record.key, 'CO_MAT')}
         />
       ),
+
     },
     {
-      title: 'Nghỉ học',
-      dataIndex: 'Nghi_hoc',
+      title: 'Nghỉ có phép',
+      dataIndex: 'Nghi_Co_Phep',
       width: '10%',
-      key: 'Nghi_hoc',
+      key: 'Nghi_Co_Phep',
       align: 'center',
       render: (_, record) => (
         <Checkbox
-          checked={attendanceStatus[record.key] === 'NGHI_HOC'}
-          onChange={() => handleCheckboxChange(record.key, 'NGHI_HOC')}
+          checked={attendanceStatus[record.key] === 'NGHI_CO_PHEP'}
+          onChange={() => handleCheckboxChange(record.key, 'NGHI_CO_PHEP')}
+        />
+      ),
+    },
+    {
+      title: 'Nghỉ không phép',
+      dataIndex: 'Nghi_Khong_Phep',
+      width: '10%',
+      key: 'Nghi_Khong_Phep',
+      align: 'center',
+      render: (_, record) => (
+        <Checkbox
+
+          checked={attendanceStatus[record.key] === 'NGHI_KHONG_PHEP'}
+          onChange={() => handleCheckboxChange(record.key, 'NGHI_KHONG_PHEP')}
         />
       ),
     },
@@ -171,12 +262,20 @@ const Attendences = () => {
       <Checkbox
         checked={attendanceStatus[data.id] === 'CO_MAT'}
         onChange={() => handleCheckboxChange(data.id, 'CO_MAT')}
+
       />
     ),
-    Nghi_hoc: (
+    Nghi_Co_Phep: (
       <Checkbox
-        checked={attendanceStatus[data.id] === 'NGHI_HOC'}
-        onChange={() => handleCheckboxChange(data.id, 'NGHI_HOC')}
+        checked={attendanceStatus[data.id] === 'NGHI_CO_PHEP'}
+        onChange={() => handleCheckboxChange(data.id, 'NGHI_CO_PHEP')}
+      />
+    ),
+    Nghi_Khong_Phep: (
+      <Checkbox
+
+        checked={attendanceStatus[data.id] === 'NGHI_KHONG_PHEP'}
+        onChange={() => handleCheckboxChange(data.id, 'NGHI_KHONG_PHEP')}
       />
     ),
     Ghi_Chu: (
@@ -241,6 +340,7 @@ const Attendences = () => {
   ];
 
   const dataAttendenceByMonth = student.map((data) => ({
+
     key: data.id,
     Ho_Ten: `${data.students.lastName} ${data.students.firstName}`,
     Ngay_sinh: formatDate(data.students.birthday.substring(0, 10)),
@@ -253,18 +353,18 @@ const Attendences = () => {
 
   const handleSubmit = async () => {
     try {
-      const values = await form.validateFields();
-console.log(Form.useForm());
-      const payload = {
-        dayOff:1,
-        classId: classId,
-        listStudent: Object.keys(attendanceStatus).map(studentId => ({
+
+      const values = form.getFieldsValue();
+      values["classId"] = classId,
+        values["listStudent"] = Object.keys(attendanceStatus).map(studentId => ({
           studentYearInfoId: parseInt(studentId),
           status: attendanceStatus[studentId],
           note: values.note[studentId] || '', // Giả sử note là một object có key là studentId
-        })),
-      };
-console.log(payload)
+        }));
+      const res = await teacherApi.postAtendence(values)
+      console.log(res);
+      getAttendence();
+      message.success("Điểm danh thành công");
     } catch (errorInfo) {
       console.error('Failed to submit form:', errorInfo);
       message.error('Failed to submit attendance data');
@@ -275,20 +375,21 @@ console.log(payload)
     <div className="attendances">
       <div className="attendanceItem">
         <div
-          className={`attendance ${attendence === 'attendance-by-day' ? 'actives' : ''}`}
-          onClick={() => setAttendence('attendance-by-day')}
+          className={`attendance ${attendenceClass === 'attendance-by-day' ? 'actives' : ''}`}
+          onClick={() => setAttendenceClass('attendance-by-day')}
         >
           Điểm danh theo ngày
         </div>
         <div
-          className={`attendance ${attendence === 'attendance-by-month' ? 'actives' : ''}`}
-          onClick={() => setAttendence('attendance-by-month')}
+          className={`attendance ${attendenceClass === 'attendance-by-month' ? 'actives' : ''}`}
+          onClick={() => setAttendenceClass('attendance-by-month')}
         >
           Điểm danh theo tháng
         </div>
       </div>
       <Form form={form}>
-        <div className={`${attendence !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
+
+        <div className={`${attendenceClass !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
           <div style={{ display: 'flex', padding: '16px' }}>
             <Form.Item className="classId" style={{ marginRight: '14px' }}>
               <Select defaultValue={classId} style={{ width: 150 }} onChange={handleChange}>
@@ -299,10 +400,11 @@ console.log(payload)
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item className="dayOff" name="dayOff"> {/* Thêm name cho Form.Item */}
+            <Form.Item className="dayOff" name="dayOff" > {/* Thêm name cho Form.Item */}
               <DatePicker
-                disabledDate={(date) => date.isBefore(dayjs())}
-                className="h-10"
+              defaultValue={dayOff}
+                className="h-10 w-30" onChange={handleChangeDay}
+                format={'M/D/YYYY'}
               />
             </Form.Item>
 
@@ -343,7 +445,7 @@ console.log(payload)
           </div>
         </div>
       </Form>
-      <div className={`${attendence !== 'attendance-by-month' ? 'hiddens' : 'attendance-by-month'}`}>
+      <div className={`${attendenceClass !== 'attendance-by-month' ? 'hiddens' : 'attendance-by-month'}`}>
         <div style={{ display: 'flex', padding: '16px' }}>
           <div style={{ marginRight: '14px' }}>
             <Select defaultValue={classId} style={{ width: 150 }} onChange={handleChange}>

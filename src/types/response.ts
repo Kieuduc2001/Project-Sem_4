@@ -224,8 +224,10 @@ export interface DataTypeAttendence {
   Ho_Ten: string;
   Ngay_sinh: string;
   Co_Mat: JSX.Element;
-  Nghi_Hoc: JSX.Element;
-  Trang_Thai: number
+
+  Nghi_Co_Phep: JSX.Element;
+  Nghi_Khong_Phep: JSX.Element;
+  Trang_Thai: number;
 }
 
 export interface Student {
@@ -533,4 +535,17 @@ export interface FeeScope {
     name: string;
     code: string;
   }[];
+}
+export interface AttendenceData {
+  id: number,
+  attendanceStatus: string,
+  note: string,
+  createdAt: string,
+  studentInfo: {
+    studentYearInfoId: number,
+    fullName: string,
+    classId: number,
+    birthday:string,
+
+  }
 }
