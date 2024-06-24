@@ -7,10 +7,11 @@ import {
   Radio,
   DatePicker,
   message,
+  Select,
 } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import mainAxios from '../../apis/main-axios';
-import { Student } from '../../types/response';
+import { SchoolYearClassData, Student } from '../../types/response';
 import teacherApi from '../../apis/urlApi';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
@@ -21,29 +22,50 @@ export default function Students() {
   const [isLoading, setIsLoading] = useState(true);
   const [form] = Form.useForm();
   const { idYear } = useContext(YearContext);
+  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
 
   useEffect(() => {
-    const fetchStudents = async () => {
-      if (idYear === null) return;
-      setIsLoading(true);
-      try {
-        const res = await teacherApi.getStudents(idYear);
-        setStudents(res?.data);
-        setIsLoading(false);
-      } catch (error: unknown) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
-          setStudents([]);
-          setIsLoading(false);
-        } else if (error instanceof Error) {
-          console.error('Failed to fetch school year classes:', error.message);
-        } else {
-          console.error('An unknown error occurred.');
-        }
-      }
-    };
+    fetchData();
     fetchStudents();
   }, [idYear]);
 
+  const fetchStudents = async () => {
+    if (idYear === null) return;
+    setIsLoading(true);
+    try {
+      const res = await teacherApi.getStudents(idYear);
+      setStudents(res?.data);
+      setIsLoading(false);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        setStudents([]);
+        setIsLoading(false);
+      } else if (error instanceof Error) {
+        console.error('Failed to fetch school year classes:', error.message);
+      } else {
+        console.error('An unknown error occurred.');
+      }
+    }
+  };
+
+  const fetchData = async () => {
+    if (idYear === null) return;
+    setIsLoading(true);
+    try {
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data || []);
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+            setSchoolYearClass([]);
+        } else if (error instanceof Error) {
+            console.error('Failed to fetch school year classes:', error.message);
+        } else {
+            console.error('An unknown error occurred.');
+        }
+    } finally {
+        setIsLoading(false);
+    }
+};
   // Hàm để mở modal
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -62,6 +84,7 @@ export default function Students() {
       const res = await mainAxios.post('/api/v1/student', formData);
 
       setIsModalOpen(false);
+      fetchStudents();
     } catch (error: any) {
       if (error.response) {
         console.error('Server Error:', error.response.data);
@@ -160,12 +183,20 @@ export default function Students() {
               <Input />
             </Form.Item>
             <Form.Item
-              label="Năm:"
-              name="schoolYearClassId"
-              rules={[{ required: true, message: 'Please input!' }]}
-            >
-              <Input />
-            </Form.Item>
+                                label="Lớp học"
+                                name="schoolYearClassId"
+                                rules={[
+                                    { required: true, message: 'Vui lòng chọn lớp học!' },
+                                ]}
+                            >
+                                 <Select>
+                                    {schoolYearClass.map((cl) => (
+                                        <Select.Option key={cl.id} value={cl.id}>
+                                           {cl.className}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
           </Form>
         </div>
       </Modal>
