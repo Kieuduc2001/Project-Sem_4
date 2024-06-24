@@ -204,7 +204,6 @@ export interface Acknowledge {
   id: number,
   Acknowledge: string
 }
-<<<<<<< HEAD
 export interface EvaluateData {
   studentStudyResults: [
     {
@@ -226,39 +225,6 @@ export interface EvaluateData {
     birthday: string
   }
 
-=======
-export interface DataTypeEvaluate {
-  key: number;
-  Stt: number;
-  Ho_Ten: string;
-  Ngay_sinh: string;
-  Nhan_Xet: JSX.Element;
-  Toan: number,
-  Tieng_viet: number;
-  Tieng_anh: number;
-  Dao_duc: number;
-  Tu_nhien_va_xa_hoi: number;
-  Lich_su: number;
-  Dia_ly: number;
-  Khoa_hoc: number;
-  Tin_hoc_va_cong_nghe: number;
-  The_duc: number;
-  Mi_thuat: number;
-  Am_nhac: number;
-  Trang_Thai: string;
-  Hanh_kiem: string;
-  Tong: number;
-}
-export interface DataTypeAttendence {
-  key: number;
-  Stt: number;
-  Ho_Ten: string;
-  Ngay_sinh: string;
-  Co_Mat: JSX.Element;
-  Nghi_Co_Phep: JSX.Element;
-  Nghi_Khong_Phep: JSX.Element;
-  Trang_Thai: number;
->>>>>>> 9bcb39d09395e0284bef4f69424d4247c2c7fe1a
 }
 export interface Student {
   id: number,
@@ -467,17 +433,9 @@ export interface AttendenceData {
   note: string,
   createdAt: string,
   studentInfo: {
-<<<<<<< HEAD
     studentYearInfoId?: number,
     fullName: string,
     classId: number,
     birthday: string
-=======
-    studentYearInfoId: number,
-    fullName: string,
-    classId: number,
-    birthday:string,
-
->>>>>>> 9bcb39d09395e0284bef4f69424d4247c2c7fe1a
   }
 }

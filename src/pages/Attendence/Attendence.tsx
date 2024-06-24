@@ -219,16 +219,9 @@ const Attendences = () => {
   const handleChange = (value: number) => {
     setClassId(value);
   };
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
 
-  const handleChangeDay = (value: any) => {
-    if (value) {
-      form.setFieldValue("dayOff", value);
-      setDayOff(value);
-    }
-  }
-
-=======
+=========
   const handleChangeDay = (value:any) => {
     if (value) {
       form.setFieldValue("dayOff", value);
@@ -236,7 +229,7 @@ const Attendences = () => {
       getAttendence();
     }
   }
->>>>>>> 9bcb39d09395e0284bef4f69424d4247c2c7fe1a
+>>>>>>>>> Temporary merge branch 2
   const formatDate = (dateString: string) => {
     const dateObject = new Date(dateString);
     const day = String(dateObject.getDate()).padStart(2, '0');
@@ -368,13 +361,13 @@ const Attendences = () => {
       align: 'center',
       render: (_, record) => (
         <Checkbox
-<<<<<<< HEAD
-          checked={record.students.attendenceData?.attendanceStatus === "NGHI_CO_PHEP"}
-          onChange={() => handleCheckboxChange(record.students.id, 'NGHI_CO_PHEP')}
-=======
+<<<<<<<<< Temporary merge branch 1
+          checked={attendanceStatus[record.key] === 'NGHI_HOC'}
+          onChange={() => handleCheckboxChange(record.key, 'NGHI_HOC')}
+=========
           checked={attendanceStatus[record.key] === 'NGHI_CO_PHEP'}
           onChange={() => handleCheckboxChange(record.key, 'NGHI_CO_PHEP')}
->>>>>>> 9bcb39d09395e0284bef4f69424d4247c2c7fe1a
+>>>>>>>>> Temporary merge branch 2
         />
       ),
     },
@@ -510,8 +503,34 @@ const Attendences = () => {
       align: 'center',
     },
   ];
-<<<<<<< HEAD
-=======
+<<<<<<<<< Temporary merge branch 1
+
+  const dataAttendenceByMonth = student.map((data) => ({
+    key: data.id,
+    Ho_Ten: `${data.students.lastName} ${data.students.firstName}`,
+    Ngay_sinh: formatDate(data.students.birthday.substring(0, 10)),
+    Stt: data.id,
+    So_Luot_Muon: 0,
+    Tong_Ngay_nghi: 0,
+    Nghi_Co_Phep: 0,
+    Nghi_Khong_Phep: 0,
+  }));
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+console.log(Form.useForm());
+      const payload = {
+        dayOff:1,
+        classId: classId,
+        listStudent: Object.keys(attendanceStatus).map(studentId => ({
+          studentYearInfoId: parseInt(studentId),
+          status: attendanceStatus[studentId],
+          note: values.note[studentId] || '', // Giả sử note là một object có key là studentId
+        })),
+      };
+console.log(payload)
+=========
 
   const dataAttendenceByMonth = student.map((data) => ({
 
