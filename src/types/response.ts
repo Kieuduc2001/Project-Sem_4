@@ -1,3 +1,5 @@
+import Students from "@pages/Students/Student-list";
+
 export interface IResponse<T> {
   data: T;
   message: string;
@@ -112,13 +114,19 @@ export interface SubjectProgram {
     };
   };
 }
-
+export interface ObjectSchoolYearGrade{
+    subject: {
+      id: number,
+      code: string,
+      name: string
+    },
+}
 export interface SchoolYearClassData {
   id: number;
   className: string;
   classCode: string;
   grade: {
-    id: number;
+    id: number; 
     name: string;
   };
   room: {
@@ -196,39 +204,28 @@ export interface Acknowledge {
   id: number,
   Acknowledge: string
 }
-export interface DataTypeEvaluate {
-  key: number;
-  Stt: number;
-  Ho_Ten: string;
-  Ngay_sinh: string;
-  Nhan_Xet: JSX.Element;
-  Toan: number,
-  Tieng_viet: number;
-  Tieng_anh: number;
-  Dao_duc: number;
-  Tu_nhien_va_xa_hoi: number;
-  Lich_su: number;
-  Dia_ly: number;
-  Khoa_hoc: number;
-  Tin_hoc_va_cong_nghe: number;
-  The_duc: number;
-  Mi_thuat: number;
-  Am_nhac: number;
-  Trang_Thai: string;
-  Hanh_kiem: string;
-  Tong: number;
-}
-export interface DataTypeAttendence {
-  key: number;
-  Stt: number;
-  Ho_Ten: string;
-  Ngay_sinh: string;
-  Co_Mat: JSX.Element;
-  Nghi_Co_Phep: JSX.Element;
-  Nghi_Khong_Phep: JSX.Element;
-  Trang_Thai: number;
-}
+export interface EvaluateData {
+  studentStudyResults: [
+    {
+      id: number,
+      studyResultScores: [
+        {
+          id: number,
+          schoolYearSubjectId:number,
+          score: string
+        }
+      ],
+      passed: boolean
+    }
+  ]
+  studentInfo: {
+    studentYearInfoId?: number,
+    fullName: string,
+    classId: number,
+    birthday: string
+  }
 
+}
 export interface Student {
   id: number,
   students: {
@@ -239,16 +236,22 @@ export interface Student {
     birthday: string,
     address: string,
     studentCode: string,
-    studentStatuses: {
-      id: number;
-      description: string;
-      status: {
-        id: number;
-        name: string;
-        code: string;
-      }
-    }[]
+    studentStatuses: Array<StudentStatus>;
+    attendenceData?: AttendenceData;
+    evaluate?:EvaluateData;
   }
+}
+
+export interface StudentStatus {
+  id: number;
+  description: string;
+  status: Status;
+}
+
+export interface Status {
+  id: number;
+  name: string;
+  code: string;
 }
 
 export interface TeacherClassSubjectData {
@@ -430,10 +433,9 @@ export interface AttendenceData {
   note: string,
   createdAt: string,
   studentInfo: {
-    studentYearInfoId: number,
+    studentYearInfoId?: number,
     fullName: string,
     classId: number,
-    birthday:string,
-
+    birthday: string
   }
 }
