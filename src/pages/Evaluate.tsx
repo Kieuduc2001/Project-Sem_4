@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { DatePicker, Form, Modal, Space } from 'antd';
 import dayjs from 'dayjs';
 import { Table } from 'antd';
-import type { TableColumnsType, TableProps } from 'antd';
+import type { TableColumnsType } from 'antd';
 import { Select } from 'antd';
 import { Button } from 'antd';
 import type {
