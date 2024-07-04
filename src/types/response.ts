@@ -1,3 +1,5 @@
+import Students from "@pages/Students/Student-list";
+
 export interface IResponse<T> {
   data: T;
   message: string;
@@ -112,13 +114,19 @@ export interface SubjectProgram {
     };
   };
 }
-
+export interface ObjectSchoolYearGrade{
+    subject: {
+      id: number,
+      code: string,
+      name: string
+    },
+}
 export interface SchoolYearClassData {
   id: number;
   className: string;
   classCode: string;
   grade: {
-    id: number;
+    id: number; 
     name: string;
   };
   room: {
@@ -196,6 +204,7 @@ export interface Acknowledge {
   id: number,
   Acknowledge: string
 }
+<<<<<<< HEAD
 export interface DataTypeEvaluate {
   key: number;
   Stt: number;
@@ -229,7 +238,30 @@ export interface DataTypeAttendence {
   Nghi_Khong_Phep: JSX.Element;
   Trang_Thai: number;
 }
+=======
+export interface EvaluateData {
+  studentStudyResults: [
+    {
+      id: number,
+      studyResultScores: [
+        {
+          id: number,
+          schoolYearSubjectId:number,
+          score: string
+        }
+      ],
+      passed: boolean
+    }
+  ]
+  studentInfo: {
+    studentYearInfoId?: number,
+    fullName: string,
+    classId: number,
+    birthday: string
+  }
+>>>>>>> 305bd6e7ebd9d477f2a11f369ec9e329bed1f7ec
 
+}
 export interface Student {
   id: number,
   students: {
@@ -240,16 +272,22 @@ export interface Student {
     birthday: string,
     address: string,
     studentCode: string,
-    studentStatuses: {
-      id: number;
-      description: string;
-      status: {
-        id: number;
-        name: string;
-        code: string;
-      }
-    }[]
+    studentStatuses: Array<StudentStatus>;
+    attendenceData?: AttendenceData;
+    evaluate?:EvaluateData;
   }
+}
+
+export interface StudentStatus {
+  id: number;
+  description: string;
+  status: Status;
+}
+
+export interface Status {
+  id: number;
+  name: string;
+  code: string;
 }
 
 export interface TeacherClassSubjectData {
@@ -542,10 +580,9 @@ export interface AttendenceData {
   note: string,
   createdAt: string,
   studentInfo: {
-    studentYearInfoId: number,
+    studentYearInfoId?: number,
     fullName: string,
     classId: number,
-    birthday:string,
-
+    birthday: string
   }
 }
