@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DatePicker, Form, Space } from 'antd';
 import dayjs from 'dayjs';
 import { Table } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
-import axios from 'axios';
 import { Select } from 'antd';
 import { Button, Modal } from 'antd';
 import mainAxios from '../apis/main-axios';
 import { DataAllClass } from '../types/response';
 import type {
   Acknowledge,
-  DataTypeAcknowledge,
   Student,
 } from '../types/response';
 
@@ -322,7 +320,7 @@ const Acknowledge = () => {
   useEffect(() => {
     getStudents();
   }, [student]);
-  const rowSelection: TableRowSelection<DataTypeAcknowledge> = {
+  const rowSelection: TableRowSelection<Student> = {
     onSelect: (record, selected, selectedRows) => {},
     onSelectAll: (selected, selectedRows, changeRows) => {},
   };
@@ -334,7 +332,7 @@ const Acknowledge = () => {
   const handleChange = (value: number) => {
     setIdClass(value);
   };
-  const columnsAcknowledge: TableColumnsType<DataTypeAcknowledge> = [
+  const columnsAcknowledge: TableColumnsType<Student> = [
     {
       title: 'Stt',
       dataIndex: 'Stt',
@@ -344,21 +342,21 @@ const Acknowledge = () => {
     },
     {
       title: 'Họ tên',
-      dataIndex: 'Ho_Ten',
+      dataIndex: 'students',
       key: 'Ho_Ten',
       width: '25%',
       align: 'center',
     },
     {
       title: 'Ngày sinh',
-      dataIndex: 'Ngay_sinh',
+      dataIndex: 'students',
       key: 'Ngay_sinh',
       width: '14%',
       align: 'center',
     },
     {
       title: 'Nhận xét',
-      dataIndex: 'Nhan_Xet',
+      dataIndex: 'students',
       width: '35%',
       key: 'Nhan_Xet',
       align: 'center',
@@ -371,21 +369,6 @@ const Acknowledge = () => {
       align: 'center',
     },
   ];
-  const dataAcknowledge = student.map((data) => ({
-    key: data.id,
-    Ho_Ten: data.lastName + data.firstName, // Assuming `s` contains the name of the student
-    Ngay_sinh: data.birthday ? data.birthday.split('T'[0]) : '',
-    Stt: data.id,
-    Nhan_Xet: (
-      <Select
-        mode="tags"
-        style={{ width: '100%' }}
-        placeholder="Nhập nhận xét"
-        options={acknowledge}
-      />
-    ),
-    Trang_Thai: 0 ? 'Đã thông báo' : 'chưa thông báo',
-  }));
 
   const options = classes.map((c) => ({
     value: c.classId,
@@ -489,7 +472,7 @@ const Acknowledge = () => {
             ...rowSelection,
           }}
           columns={columnsAcknowledge}
-          dataSource={dataAcknowledge}
+          dataSource={student}
           pagination={false}
           bordered
           scroll={{ y: 385 }}
