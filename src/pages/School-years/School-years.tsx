@@ -25,8 +25,6 @@ export default function SchoolYears() {
     fetchData();
     console.log('aaaa', fetchData);
   }, []);
-
-
   const fetchData = async () => {
     try {
       setIsLoading(true);
@@ -37,7 +35,6 @@ export default function SchoolYears() {
       console.error('Error fetching data:', error);
       setIsLoading(false);
     }
-
   };
 
   const showModal = () => {

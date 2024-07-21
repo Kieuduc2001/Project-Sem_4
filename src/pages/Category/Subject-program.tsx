@@ -67,7 +67,6 @@ export default function SchoolProgram() {
         catch (error) {
             console.error('Error fetching grades:', error);
         };
-
     };
 
     useEffect(() => {
@@ -104,11 +103,9 @@ export default function SchoolProgram() {
 
             setIsModalOpen(false);
             message.success('Thành Công');
-
             if (selectedGradeId !== undefined) {
                 fetchData(selectedGradeId); // Fetch data again to refresh the table
             }
-
         } catch (error: any) {
             if (error.response) {
                 console.error('Server Error:', error.response.data);

@@ -217,6 +217,7 @@ const Attendences = () => {
           onChange={() => handleCheckboxChange(record.id, 'CO_MAT')}
         />
       ),
+
     },
     {
       title: 'Nghỉ có phép',
@@ -315,6 +316,7 @@ const Attendences = () => {
 
   const handleSubmit = async () => {
     try {
+
       const values = form.getFieldsValue();
       const students: StudentRequestDto[] = student.map((student, index: number) => {
         const attendanceStatus = student.students.attendenceData?.attendanceStatus || 'CO_MAT';
