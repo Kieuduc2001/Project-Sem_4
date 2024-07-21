@@ -1,4 +1,4 @@
-import Students from "@pages/Students/Student-list";
+
 
 export interface IResponse<T> {
   data: T;
@@ -113,20 +113,14 @@ export interface SubjectProgram {
       end: string;
     };
   };
-}
-export interface ObjectSchoolYearGrade{
-    subject: {
-      id: number,
-      code: string,
-      name: string
-    },
+  evaluate?: EvaluateData;
 }
 export interface SchoolYearClassData {
   id: number;
   className: string;
   classCode: string;
   grade: {
-    id: number; 
+    id: number;
     name: string;
   };
   room: {
@@ -140,7 +134,41 @@ export interface SchoolYearClassData {
     }
   }
 }
+export interface SchoolYearClassAndSubEntrusted {
+  schoolYearSubject: SchoolYearSubEntrusted,
+  classList: SchoolYearClassEntrusted[]
+}
+export interface SchoolYearSubEntrusted {
+    id: number,
+    subject: {
+      id: number,
+      code: string,
+      type: string,
+      subjectPointType: string,
+      description: null,
+      name: string,
+      numberType: boolean
+    },
+    schoolYear: null
+}
+export interface SchoolYearClassEntrusted {
 
+  numberOfStudent: number,
+  completedQuantity: number,
+  classInfo: {
+    id: number,
+    className: string,
+    classCode: string,
+    grade: {
+      id: number,
+      name: string
+    },
+    room: null,
+    teacherSchoolYear: null,
+    schoolYear: null
+  },
+  completed: null
+}
 export interface SchoolYearSubjectResponse {
   id: number;
   classId: number;
@@ -158,13 +186,30 @@ export interface SchoolYearSubjectResponse {
   };
 }
 
-// export interface ProgramData {
-//   id: number;
-//   schoolYearSubjectId: string;
-//   gradeId: string;
-//   number: number;
-//   sem: string;
-// }
+export interface ClassAndSubjectTeacher {
+  id: number,
+  className: string,
+  classCode: string,
+  grade: {
+    id: number,
+    name: number
+  },
+  subjects: SchoolYearSubject[]
+}
+
+export interface SchoolYearSubject {
+  id: number,
+  subject: {
+    id: number,
+    code: string,
+    type: string,
+    subjectPointType: string,
+    description: null,
+    name: string,
+    numberType: boolean
+  },
+  schoolYear: null
+}
 
 export interface GradeData {
   id: number;
@@ -204,63 +249,25 @@ export interface Acknowledge {
   id: number,
   Acknowledge: string
 }
-<<<<<<< HEAD
-export interface DataTypeEvaluate {
-  key: number;
-  Stt: number;
-  Ho_Ten: string;
-  Ngay_sinh: string;
-  Nhan_Xet: JSX.Element;
-  Toan: number,
-  Tieng_viet: number;
-  Tieng_anh: number;
-  Dao_duc: number;
-  Tu_nhien_va_xa_hoi: number;
-  Lich_su: number;
-  Dia_ly: number;
-  Khoa_hoc: number;
-  Tin_hoc_va_cong_nghe: number;
-  The_duc: number;
-  Mi_thuat: number;
-  Am_nhac: number;
-  Trang_Thai: string;
-  Hanh_kiem: string;
-  Tong: number;
+export interface ScoreTypes {
+  DTB: number[] | undefined;
+  KTTX: number[] | undefined;
+  KT_CUOI_KY: number[] | undefined;
+  KT_GIUA_KY: number[] | undefined;
 }
-export interface DataTypeAttendence {
-  key: number;
-  Stt: number;
-  Ho_Ten: string;
-  Ngay_sinh: string;
-  Co_Mat: JSX.Element;
-
-  Nghi_Co_Phep: JSX.Element;
-  Nghi_Khong_Phep: JSX.Element;
-  Trang_Thai: number;
-}
-=======
 export interface EvaluateData {
-  studentStudyResults: [
-    {
-      id: number,
-      studyResultScores: [
-        {
-          id: number,
-          schoolYearSubjectId:number,
-          score: string
-        }
-      ],
-      passed: boolean
-    }
-  ]
-  studentInfo: {
+  studentScores: ScoreTypes;
+  id: number;
+  note: string;
+  semester: string;
+  semesterName: string;
+  status: string;
+  studentYearInfo: {
     studentYearInfoId?: number,
     fullName: string,
     classId: number,
     birthday: string
   }
->>>>>>> 305bd6e7ebd9d477f2a11f369ec9e329bed1f7ec
-
 }
 export interface Student {
   id: number,
@@ -274,7 +281,8 @@ export interface Student {
     studentCode: string,
     studentStatuses: Array<StudentStatus>;
     attendenceData?: AttendenceData;
-    evaluate?:EvaluateData;
+    evaluate?: EvaluateData;
+    subject?: SubjectProgram;
   }
 }
 
