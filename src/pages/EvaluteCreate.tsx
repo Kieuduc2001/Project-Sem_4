@@ -11,8 +11,8 @@ import axios from 'axios';
 import mainAxios from '../apis/main-axios';
 import { Button, Form, Input, Select, Table, TableColumnsType, message } from 'antd';
 import dayjs from 'dayjs';
-import { EvaluteDto } from 'types/request';
 import { redirect } from 'react-router-dom';
+import { EvaluteRequesDto } from 'types/request';
 
 const { Option } = Select;
 const optionSemmer = [
@@ -39,7 +39,7 @@ const optionTypePoint = [
     value: "KTTX"
   },
   {
-    label: "Cả năm",
+    label: "Đểm Trung Bình",
     value: "DTB"
   },
   {
@@ -55,18 +55,20 @@ const EvaluateCreate = () => {
   const { idYear } = useContext(YearContext);
   const [form] = Form.useForm();
   const [schoolYearClassTeacher, setSchoolYearClassTeacher] = useState<ClassAndSubjectTeacher[]>([]);
+  const [semmerId,setSemmerId] = useState<string>();
+  const [subjectId,setSubjectId] = useState<number>();
   const [isLoading, setIsLoading] = useState(true);
   const [typePoint, setTypePoint] = useState<string>("");
-  const [dayOff, setDayOff] = useState(dayjs());
-  const [requestDto, setRequestDto] = useState<EvaluteDto>({
-    schoolYearClassId: 0,
-    sem: "",
+  const [requestDto, setRequestDto] = useState<EvaluteRequesDto>({
+    schoolYearClassId: classId!,
+    sem: semmerId!,
     studentScoreDetails: [],
-    schoolYearSubjectId: 0
+    schoolYearSubjectId:subjectId!
   });
 
   const fetchStudents = async () => {
     try {
+      form.resetFields(["score"]);
       if (schoolYearClassTeacher !== undefined && classId !== undefined) {
         const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
         setStudent(studentRes.data)
@@ -86,6 +88,7 @@ const EvaluateCreate = () => {
       let s = schoolYearClassTeacher.filter((cl) => cl?.id == classId);
       s.forEach((as) => {
         setSubjects(as.subjects)
+        setSubjectId(as.subjects[0]?.id);
       })
       setRequestDto({
         schoolYearClassId: classId!,
@@ -172,12 +175,14 @@ const EvaluateCreate = () => {
     let s = schoolYearClassTeacher.filter((cl) => cl.id == schoolYearClassTeacher[0].id);
     s.forEach((as) => {
       setSubjects(as.subjects)
+      setSubjectId(as.subjects[0]?.id);
     })
   }
 
 
   const handleSemmerChange = (value: string) => {
     setRequestDto({ ...requestDto, sem: value });
+    setSemmerId(value);
   };
 
   const handleSubjectTeachChange = (value: number) => {
@@ -194,11 +199,13 @@ const EvaluateCreate = () => {
 
   const handleSubmit = async () => {
     try {
-      console.log(requestDto);
-      const res = await teacherApi.postEluate(requestDto); 
+      const value = form.validateFields();
+      console.log("value",value);
+    
+      const res = await teacherApi.postEluate(requestDto);
       message.success("Thêm điểm thành công");
-    } catch (errorInfo) {
-      message.error('Thêm điểm thất bại');
+    } catch {
+      message.error("Thêm điểm thất bại");
     }
   };
 
@@ -246,8 +253,8 @@ const EvaluateCreate = () => {
                 message: "Chi duoc nhap so hoac chu !"
               },
               {
-                required:true,
-                message:"khong duoc de trong"
+                required: true,
+                message: "khong duoc de trong"
               }
             ]}>
             <Input placeholder="Nhập điểm" onChange={(event) => setPoint(event.target.value, record.students.id)} />
@@ -259,49 +266,60 @@ const EvaluateCreate = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', padding: '16px' }}>
-        <div style={{ marginRight: '14px', display: "flex" }}>
-          <Select placeholder="Chọn lớp học"
-            value={classId} style={{ width: 150 }} onChange={handleClassChange}>
-            {schoolYearClassTeacher.map((classData,indexClass) => (
-              <Option key={indexClass} value={classData.id} IdGrade={classData.grade.id}>
-                {classData.className}
-              </Option>
-            ))}
-          </Select>
-          <Select placeholder="Chọn môn học"
-            className='ml-1'
-            style={{ width: 150 }} onChange={handleSubjectTeachChange}>
-            {subjects.map((sj,indexSub) => (
-              <Option key={indexSub} value={sj.id} >
-                {sj.subject.name} 
-              </Option>
-            ))}
-          </Select>
-          <Select placeholder="Chọn kì học"
-            className='ml-1 w-[122px]'
-            onChange={handleSemmerChange}>
-            {optionSemmer.map((semesters, index) => (
-              <Option key={index} value={semesters.value}>
-                {semesters.label}
-              </Option>
-            ))}
-          </Select>
-          <Select placeholder="Chọn loại điểm"
-            className='ml-1 w-[140px]'
-            onChange={handleTypePointChange}>
-            {optionTypePoint.map((typePoint, indexTypePoint) => (
-              <Option key={indexTypePoint} value={typePoint.value}>
-                {typePoint.label}
-              </Option>
-            ))}
-          </Select>
-          <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-8">
-            Tất cả: {student.length} học sinh
+      <Form form={form}>
+        <div style={{ display: 'flex', padding: '16px' }}>
+          <div style={{ marginRight: '14px', display: "flex" }}>
+            <Form.Item name='schoolYearClassId'>
+              <Select placeholder="Chọn lớp học"
+                value={classId} style={{ width: 150 }} onChange={handleClassChange}>
+                {schoolYearClassTeacher.map((classData, indexClass) => (
+                  <Option key={indexClass} value={classData.id} IdGrade={classData.grade.id}>
+                    {classData.className}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item name='schoolYearSubjectId'>
+              <Select placeholder="Chọn môn học"
+                className='ml-1'
+                style={{ width: 150 }} onChange={handleSubjectTeachChange}>
+                {subjects.map((sj, indexSub) => (
+                  <Option key={indexSub} value={sj.id} >
+                    {sj.subject.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item name='sem'>
+              <Select placeholder="Chọn kì học"
+                className='ml-1 w-[122px]'
+                onChange={handleSemmerChange}
+                >
+                {optionSemmer.map((semesters, index) => (
+                  <Option key={index} value={semesters.value}>
+                    {semesters.label}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item name='pointType'>
+              <Select placeholder="Chọn loại điểm"
+                className='ml-1 w-[140px]'
+                onChange={handleTypePointChange}>
+                {optionTypePoint.map((typePoint, indexTypePoint) => (
+                  <Option key={indexTypePoint} value={typePoint.value}>
+                    {typePoint.label}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-8">
+              Tất cả: {student.length} học sinh
+            </div>
           </div>
         </div>
-      </div>
-      <Form form={form}>
+                
         <Table
           columns={columnEvaluate}
           dataSource={student}

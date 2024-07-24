@@ -5,6 +5,7 @@ import { Select } from 'antd';
 import type {
   EvaluateData,
   SchoolYearClassAndSubEntrusted,
+  SchoolYearClassData,
   SchoolYearClassEntrusted,
   Student,
   SubjectProgram,
@@ -14,7 +15,7 @@ import teacherApi from '../apis/urlApi';
 import axios from 'axios';
 import mainAxios from '../apis/main-axios';
 import { NavLink } from 'react-router-dom';
-import { number } from 'yup';
+import Students from './Students/Student-list';
 
 const { Option } = Select;
 const optionSemmer = [
@@ -35,7 +36,7 @@ const Evaluate = () => {
   const [student, setStudent] = useState<Student[]>([]);
   const [classId, setClassId] = useState<number>();
   const { idYear } = useContext(YearContext);
-  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassEntrusted[]>([]);
+  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [idGrade, setIdGrade] = useState<number | null>(1);
   const [semester, setSemester] = useState<string>("HOC_KI_1");
@@ -49,16 +50,15 @@ const Evaluate = () => {
   }, [idYear])
   useEffect(() => {
     fetchSchoolYearClassData();
+    fetchStudents(true);
   }, [subjectIdGrade])
   const fetchSchoolYearClassData = async () => {
     if (idYear === null) return;
     try {
-      const res = await teacherApi.getSchoolYearClassEntrusted(idYear, semester);
-      const classSchoolYearSubject = res.data;
-      let SchoolYearSubjectData = classSchoolYearSubject.filter((clss: SchoolYearClassAndSubEntrusted) => clss.schoolYearSubject.id === subjectIdGrade);
-      SchoolYearSubjectData.forEach((cls: SchoolYearClassAndSubEntrusted) => {
-        setSchoolYearClass(cls.classList)
-      })
+      const res = await teacherApi.getSchoolYearClass(idYear);
+      setSchoolYearClass(res?.data);
+      if (res.status === 200) {
+      }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         setSchoolYearClass([]);
@@ -80,17 +80,20 @@ const Evaluate = () => {
         if (getStudents) {
           const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
           if (studentRes.status === 200) {
-            const evaluateRes = await teacherApi.getEvaluateSubject(classId, subjectIdGrade, semester);
+            const evaluateRes = await teacherApi.getEvaluateSubject(classId, subjectIdGrade, semester)
+            console.log("evaluateRes", evaluateRes)
             if (evaluateRes.status === 200) {
               const newStudent = studentRes.data.map((sd: Student) => {
                 sd.students.evaluate = evaluateRes.data.studentScoreSubject.find((el: EvaluateData) => el.studentYearInfo.studentYearInfoId === sd.id);
                 return sd;
               });
+              console.log("newStudent", newStudent)
               setStudent(newStudent);
             }
           }
         }
       }
+      console.log(student)
     }
 
     catch (error) {
@@ -109,9 +112,11 @@ const Evaluate = () => {
   const handleClassChange = (value: number, option: any) => {
     setClassId(value);
     setIdGrade(option.IdGrade);
+    fetchStudents(true);
   };
   const handleSemmerChange = (value: string) => {
     setSemester(value);
+    fetchStudents(true)
   };
   const formatDate = (dateString: string) => {
     const dateObject = new Date(dateString);
@@ -122,16 +127,7 @@ const Evaluate = () => {
   };
   const handleSubjectClassChange = (value: number) => {
     setSubjectGrade(value);
-  }
-  const chooseSubject = async (idSubject: number) => {
-    setSubjectGrade(idSubject);
-    const res = await teacherApi.getSchoolYearClassEntrusted(idYear, semester);
-    const classSchoolYearSubject = res.data;
-    let SchoolYearSubjectData = classSchoolYearSubject.filter((clss: SchoolYearClassAndSubEntrusted) => clss.schoolYearSubject.id === idSubject);
-    SchoolYearSubjectData.forEach((cls: SchoolYearClassAndSubEntrusted) => {
-      setSchoolYearClass(cls.classList)
-    })
-
+    fetchStudents(true)
   }
   const columnEvaluate: TableColumnsType<Student> = [
     {
@@ -163,93 +159,133 @@ const Evaluate = () => {
       )
     },
     {
-      title: 'Điểm Trung Bình ',
+      title: 'Điểm Trung Bình',
       dataIndex: 'students',
-      key: 'Diem',
+      key: 'DiemTrungBinh',
       width: '14%',
       align: 'center',
       render: (_, item) => (
-        <>{item.students.evaluate?.studentScores.DTB}</>
+        console.log("item", item.students.evaluate?.studentScores),
+        <>
+          {
+            item.students.evaluate?.studentScores.studentScores?.DTB.map((DB)=>{
+              <div>
+                  {
+                    DB.score
+                  }
+              </div>
+            })
+          }
+        </>
       )
     },
     {
       title: 'Điểm Kiểm Tra Thường Xuyên',
       dataIndex: 'students',
-      key: 'Diem',
+      key: 'DiemKTTX',
       width: '14%',
       align: 'center',
       render: (_, item) => (
-        <>{item.students.evaluate?.studentScores.KTTX}</>
+        <>
+        {
+          item.students.evaluate?.studentScores.studentScores?.DTB.map((DB)=>{
+            <div>
+                {
+                  DB.score
+                }
+            </div>
+          })
+        }
+      </>
       )
     },
     {
-      title: 'Điểm Kiểm Tra Cuối Kì ',
+      title: 'Điểm Kiểm Tra Cuối Kì',
       dataIndex: 'students',
-      key: 'Diem',
+      key: 'DiemKTCK',
       width: '14%',
       align: 'center',
       render: (_, item) => (
-        <>{item.students.evaluate?.studentScores.KT_CUOI_KY}</>
+        <>
+          {
+            item.students.evaluate?.studentScores.studentScores?.DTB.map((DB)=>{
+              <div>
+                  {
+                    DB.score
+                  }
+              </div>
+            })
+          }
+        </>
       )
     },
     {
-      title: 'Điểm Kiểm Tra Giữa Kì ',
+      title: 'Điểm Kiểm Tra Giữa Kì',
       dataIndex: 'students',
-      key: 'Diem',
+      key: 'DiemKTGK',
       width: '14%',
       align: 'center',
       render: (_, item) => (
-        <>{item.students.evaluate?.studentScores.DTB}</>
+        <>
+        {
+          item.students.evaluate?.studentScores.studentScores?.DTB.map((DB)=>{
+            <div>
+                {
+                  DB.score
+                }
+            </div>
+          })
+        }
+      </>
       )
     }
   ];
   return (
     <div className="evaluate ">
-              <div>
-          <div style={{ display: 'flex', padding: '16px' }}>
-            <div style={{ marginRight: '14px', display: "flex" }}>
-              <Select placeholder="Chọn môn học"
-                className='mr-1'
-                style={{ width: 150 }} onChange={handleSubjectClassChange}>
-                {subbjectGradeSchoolYear.map((subData, indexSubject) => (
-                  <Option key={indexSubject} value={subData.schoolYearSubject.id}>
-                    {subData.schoolYearSubject.subject.name}
-                  </Option>
-                ))}
-              </Select>
-              <Select placeholder="Chọn lớp học"
-                style={{ width: 150 }} onChange={handleClassChange}>
-                {schoolYearClass.map((classData, indextClass) => (
-                  <Option key={indextClass} value={classData.classInfo?.id}>
-                    {classData.classInfo?.className}
-                  </Option>
-                ))}
-              </Select>
-              <Select placeholder="Chọn kì học"
-                className='ml-1'
-                value={semester}
-                onChange={handleSemmerChange}>
-                {optionSemmer.map((semesters, index) => (
-                  <Option key={index} value={semesters.value}>
-                    {semesters.label}
-                  </Option>
-                ))}
-              </Select>
-            </div>
-
-            <div style={{ width: '100%' }}>
-              <NavLink
-                to='/evaluteCreate'
-                style={{ float: 'right', background: '#1677ff', alignContent: 'center' }}
-                className='float-right bg-green-600 text-center text-white h-8 w-24 rounded'
-              >
-                Thêm điểm
-              </NavLink>
-            </div>
+      <div>
+        <div style={{ display: 'flex', padding: '16px' }}>
+          <div style={{ marginRight: '14px', display: "flex" }}>
+            <Select placeholder="Chọn môn học"
+              className='mr-1'
+              style={{ width: 150 }} onChange={handleSubjectClassChange}>
+              {subbjectGradeSchoolYear.map(subData => (
+                <Option key={subData.id} value={subData.schoolYearSubject.id}>
+                  {subData.schoolYearSubject.subject.name}
+                </Option>
+              ))}
+            </Select>
+            <Select placeholder="Chọn lớp học"
+              style={{ width: 150 }} onChange={handleClassChange}>
+              {schoolYearClass.map(classData => (
+                <Option key={classData.id} value={classData.id}>
+                  {classData.className}
+                </Option>
+              ))}
+            </Select>
+            <Select placeholder="Chọn kì học"
+              className='ml-1'
+              value={semester}
+              onChange={handleSemmerChange}>
+              {optionSemmer.map(semesters => (
+                <Option key={semesters.value} value={semesters.value}>
+                  {semesters.label}
+                </Option>
+              ))}
+            </Select>
           </div>
-          <div>
-          {classId && subjectIdGrade && semester ?
 
+          <div style={{ width: '100%' }}>
+            <NavLink
+              to='/evaluteCreate'
+              style={{ float: 'right', background: '#1677ff', alignContent: 'center' }}
+              className='float-right bg-green-600 text-center text-white h-8 w-24 rounded'
+            >
+              Thêm điểm
+            </NavLink>
+          </div>
+        </div>
+        <div>
+          {classId && subjectIdGrade && semester ?
             <Table
               columns={columnEvaluate}
               dataSource={student}
@@ -258,11 +294,11 @@ const Evaluate = () => {
               scroll={{ x: 1500, y: 365 }}
             /> :
             <Result className='mt-20'
-            title="vui lòng chọn môn học và lớp học để xem điểm"
-          />
+              title="vui lòng chọn môn học và lớp học để xem điểm"
+            />
           }
-          </div>
         </div>
+      </div>
     </div>
   );
 };
