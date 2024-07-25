@@ -21,4 +21,5 @@ export interface EvaluteRequesDto {
       pointType: string
     }[]
   }[]
+
 }

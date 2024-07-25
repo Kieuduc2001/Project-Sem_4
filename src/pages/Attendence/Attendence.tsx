@@ -15,6 +15,7 @@ import TextArea from 'antd/es/input/TextArea';
 import { AttendanceRequestDto, StudentRequestDto } from 'types/request';
 import axios from 'axios';
 
+const { Step } = Steps;
 const { Option } = Select;
 const Attendences = () => {
   const [student, setStudent] = useState<Student[]>([]);
@@ -53,6 +54,7 @@ const Attendences = () => {
     form.resetFields(["note"]);
     try {
       if (schoolYearClass !== null && classId !== null && classId !== undefined) {
+
         if (getStudents) {
           const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
           if (studentRes.status === 200) {
@@ -79,6 +81,7 @@ const Attendences = () => {
                 return std;
               }));
             }
+
           }
         }
       }
@@ -86,6 +89,7 @@ const Attendences = () => {
     catch (error) {
       setStudent([])
       console.log(message)
+
     }
   };
 
@@ -175,8 +179,6 @@ const Attendences = () => {
     );
   };
 
-
-
   const columnsAttendenceByDay: TableColumnsType<Student> = [
     {
       title: 'Stt',
@@ -218,6 +220,7 @@ const Attendences = () => {
           onChange={() => handleCheckboxChange(record.id, 'CO_MAT')}
         />
       ),
+
     },
     {
       title: 'Nghỉ có phép',
@@ -261,8 +264,10 @@ const Attendences = () => {
   ];
 
 
+
   const handleSubmit = async () => {
     try {
+
       const values = form.getFieldsValue();
       const students: StudentRequestDto[] = student.map((student, index: number) => {
         const attendanceStatus = student.students.attendenceData?.attendanceStatus || 'CO_MAT';
@@ -366,16 +371,13 @@ const Attendences = () => {
             <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
               Không phép: {`${CountStudentSuspectedNotPermission}`}
             </div>
-          </div>
-          {isLoading ? (
-            <Loader />
-          ) : (
             <div className="list-student">
               <Table
                 columns={columnsAttendenceByDay}
                 dataSource={student}
                 pagination={false}
                 bordered
+                scroll={{ y: 385 }}
               />
             </div>
           )}

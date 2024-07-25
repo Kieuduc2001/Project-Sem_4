@@ -120,7 +120,7 @@ export interface SchoolYearClassData {
   className: string;
   classCode: string;
   grade: {
-    id: number;
+    id: number; 
     name: string;
   };
   room: {
@@ -277,7 +277,8 @@ interface StudentYearInfo {
 export interface EvaluateData {
   schoolYearSubject: null,
   studentScores: ScoreType;
-  studentYearInfo: StudentYearInfo;
+  studentYearInfo: StudentYearInfo
+
 }
 export interface Student {
   id: number,
@@ -292,6 +293,7 @@ export interface Student {
     studentStatuses: Array<StudentStatus>;
     attendenceData?: AttendenceData;
     evaluate?: EvaluateData;
+
   }
 }
 
@@ -424,6 +426,33 @@ export interface SubjectForSchedule {
   };
 }
 
+
+
+export interface CalendarRelease {
+  id: number;
+  title: string;
+  releaseAt: string;
+  schoolYear: {
+    id: number;
+    startSem1: string;
+    startSem2: string;
+    end: string;
+  };
+  schedules: {
+    id: number;
+    indexLesson: number;
+    studyTime: 'SANG' | 'CHIEU';
+    dayOfWeek: 'T2' | 'T3' | 'T4' | 'T5' | 'T6';
+    note: string | null;
+    teacherSchoolYearId: number;
+    schoolYearClassId: number;
+    schoolYearSubjectId: number;
+    teacherName: string;
+    className: string;
+    subjectName: string;
+  }[];
+}
+
 export interface FeeList {
   id: number;
   title: string;
@@ -456,28 +485,112 @@ export interface FeeList {
   }[];
 }
 
-export interface CalendarRelease {
+export interface FeePeriodResponse {
   id: number;
   title: string;
-  releaseAt: string;
-  schoolYear: {
+  content: string;
+  status: boolean;
+  statusCode: string;
+  endDate: string;
+  createdAt: string;
+  schoolyear: {
     id: number;
     startSem1: string;
     startSem2: string;
     end: string;
   };
-  schedules: {
+  schoolyearfees: {
     id: number;
-    indexLesson: number;
-    studyTime: 'SANG' | 'CHIEU';
-    dayOfWeek: 'T2' | 'T3' | 'T4' | 'T5' | 'T6';
-    note: string | null;
-    teacherSchoolYearId: number;
-    schoolYearClassId: number;
-    schoolYearSubjectId: number;
-    teacherName: string;
-    className: string;
-    subjectName: string;
+    title: string;
+    term: string;
+    termName: string;
+    compel: boolean;
+    status: boolean;
+    refund: boolean;
+    exemption: boolean;
+    paymentTime: {
+      id: number;
+      name: string;
+      time: number;
+    };
+    schoolyear: {
+      id: number;
+      startSem1: string;
+      startSem2: string;
+      end: string;
+    };
+    feePrices: {
+      id: number;
+      price: number;
+      gradeId: number | null;
+      unit: {
+        id: number;
+        name: string;
+        code: string;
+      };
+    }[];
+  }[];
+  feePeriodScopes: {
+    id: number;
+    objectId: number;
+    scope: {
+      id: number;
+      name: string;
+      code: string;
+    };
+  }[];
+  schoolYearFeePeriods: {
+    id: number;
+    amount: number;
+    schoolyearfee: {
+      id: number;
+      title: string;
+      term: string;
+      termName: string;
+      compel: boolean;
+      status: boolean;
+      refund: boolean;
+      exemption: boolean;
+      paymentTime: {
+        id: number;
+        name: string;
+        time: number;
+      };
+      schoolyear: {
+        id: number;
+        startSem1: string;
+        startSem2: string;
+        end: string;
+      };
+      feePrices: {
+        id: number;
+        price: number;
+        gradeId: number | null;
+        unit: {
+          id: number;
+          name: string;
+          code: string;
+        };
+      }[];
+    };
+  }[];
+}
+
+export interface FeeScope {
+  paymentTimeList: {
+    id: number;
+    name: string;
+    time: number;
+  }[];
+  scopeList: {
+    id: number;
+    name: string;
+    code: string;
+  }[];
+  unitList: {
+    id: number;
+    name: string;
+    code: string;
   }[];
 }
 export interface AttendenceData {

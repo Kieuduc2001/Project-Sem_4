@@ -1,4 +1,5 @@
 import { AttendanceRequestDto, EvaluteRequesDto } from 'types/request';
+
 import { IResponse } from '../types/response';
 import mainAxios from './main-axios';
 
@@ -165,6 +166,7 @@ const teacherApi = {
     return mainAxios.get(`${URL.GET_CLASS_TEACHER}?schoolYearId=${yearId}`)
   } 
   ,
+
   updateAtendence:():Promise<IResponse<any>> =>{
     return mainAxios.put(`${URL.CREATE_ATENDENCE}`)
   }

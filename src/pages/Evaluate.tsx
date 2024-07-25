@@ -57,8 +57,6 @@ const Evaluate = () => {
     try {
       const res = await teacherApi.getSchoolYearClass(idYear);
       setSchoolYearClass(res?.data);
-      if (res.status === 200) {
-      }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         setSchoolYearClass([]);
@@ -73,7 +71,6 @@ const Evaluate = () => {
       setIsLoading(false);
     }
   };
-
   const fetchStudents = async (getStudents: boolean = false): Promise<void> => {
     try {
       if (schoolYearClass !== undefined && classId !== undefined) {
@@ -107,6 +104,7 @@ const Evaluate = () => {
       const res = await teacherApi.getSchoolYearSubjectGrade(idGrade);
       setSubjectGradeSchoolYear(res.data);
     }
+
   }
 
   const handleClassChange = (value: number, option: any) => {
@@ -117,6 +115,7 @@ const Evaluate = () => {
   const handleSemmerChange = (value: string) => {
     setSemester(value);
     fetchStudents(true)
+
   };
   const formatDate = (dateString: string) => {
     const dateObject = new Date(dateString);
@@ -146,6 +145,7 @@ const Evaluate = () => {
       align: 'center',
       render: (_, item) => (
         <>{item.students.firstName} {item.students.lastName}</>
+
       )
     },
     {
@@ -235,7 +235,7 @@ const Evaluate = () => {
               style={{ width: 150 }} onChange={handleClassChange}>
               {schoolYearClass.map(classData => (
                 <Option key={classData.id} value={classData.id}>
-                  {classData.className}
+    {classData.className}
                 </Option>
               ))}
             </Select>
@@ -275,6 +275,53 @@ const Evaluate = () => {
           }
         </div>
       </div>
+      <Modal
+        open={open}
+        title="Nhận xét nhanh"
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Huỷ bỏ
+          </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            loading={loading}
+            onClick={handleOk}
+            style={{ background: 'rgb(52, 150, 52' }}
+          >
+            Lưu
+          </Button>,
+        ]}
+      >
+        <div>
+          <p>
+            nhập điểm
+          </p>
+
+        </div>
+        <Form style={{ marginTop: '15px' }}>
+          <Form.Item
+            name={'studentYearInfoId'}
+            rules={[
+              { required: true, message: 'Vui lòng chọn học sinh!' },
+            ]}
+            label="Thêm điểm cho học sinh"
+          >
+            <Select>
+              {student.map((st) => (
+                <Select.Option key={st.students.id} value={st.students.id}>
+                  {st.students.lastName + st.students.lastName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item>
+
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
