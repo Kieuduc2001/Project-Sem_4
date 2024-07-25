@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getCookie, setCookie } from '../utils/storage/cookie-storage';
 import { Storage } from '../contstants/storage';
 
-const baseURL = 'http://222.254.3.169:4869';
+const baseURL = 'http://113.178.34.234:4869';
 
 const mainAxios = axios.create({
   baseURL,

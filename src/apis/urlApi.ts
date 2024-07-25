@@ -1,4 +1,5 @@
-import { AttendanceRequestDto } from 'types/request';
+import { AttendanceRequestDto, EvaluteRequesDto } from 'types/request';
+
 import { IResponse } from '../types/response';
 import mainAxios from './main-axios';
 
@@ -15,6 +16,7 @@ enum URL {
   CREATE_SCHOOL_YEAR_CLASS = '/api/v1/school/creat-school-year-class',
   CREATE_SCHOOL_YEAR_SUBJECT_GRADE = '/api/v1/school/creat-school-year-subject-grade',
   CREATE_TEACHER_CLASS_SUBJECT = '/api/v1/school/creat-teacher-school-year-class-subject',
+  CREATE_EVALUATE = '/api/v1/student-score/create-points',
   GET_TEACHER_SCHOOL_YEAR = '/api/v1/school/teacher-school-year',
   GET_SCHOOL_YEAR_SUBJECT = '/api/v1/school/school-year-subject',
   GET_SCHOOL_YEAR_SUBJECT_GRADE = '/api/v1/school/school-year-subject-grade',
@@ -33,7 +35,10 @@ enum URL {
   //Fee
   GET_FEE_LIST = '/api/v1/school-year-fee/getBy',
   GET_Attendence = '/api/v1/student/get-attendance',
-  GET_EVALUATE ='/api/v1/student-study-result',
+  GET_EVALUATE_SUBJECT ='/api/v1/student-score/get-student-score-subject',
+
+  GET_CLASS_TEACHER = '/api/v1/teacher/getClasses',
+  GET_SCHOOL_YEAR_CLASS_ENTRUSTED = '/api/v1/student-score/get-class-list-entrusted'
 }
 
 const teacherApi = {
@@ -101,6 +106,10 @@ const teacherApi = {
   postAtendence: (payload: AttendanceRequestDto): Promise<IResponse<any>> => {
     return mainAxios.post(URL.CREATE_ATENDENCE, payload);
   },
+  postEluate:(payload:EvaluteRequesDto):Promise<IResponse<any>>=>{
+    return mainAxios.post(URL.CREATE_EVALUATE,payload);
+  }
+  ,
   getSchoolYear: (): Promise<IResponse<any>> => {
     return mainAxios.get(URL.GET_SCHOOL_YEAR);
   },
@@ -118,6 +127,9 @@ const teacherApi = {
   },
   getSchoolYearClass: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_SCHOOL_YEAR_CLASS}?schoolYearId=${id}`);
+  },
+  getSchoolYearClassEntrusted:(idYear:number|null,sem:string): Promise<IResponse<any>> =>{
+    return mainAxios.get(`${URL.GET_SCHOOL_YEAR_CLASS_ENTRUSTED}?schoolYearId=${idYear}&sem=${sem}`);
   },
   getTeacherSchoolYearClassSubject: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_SCHOOL_YEAR_TEACHER_SUBJECT}?schoolYearId=${id}`)
@@ -147,9 +159,14 @@ const teacherApi = {
   getAttendence:(classId:number|null,dayOff:string):Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_Attendence}?date=${dayOff}&schoolYearClassId=${classId}`);
   },
-  getEvaluate:(classId:number|null,sem:string):Promise<IResponse<any>> => {
-    return mainAxios.get(`${URL.GET_EVALUATE}?schoolYearClassId=${classId}&sem=${sem}`);
+  getEvaluateSubject:(classId:number|undefined,subjectId:number|undefined,sem:string):Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_EVALUATE_SUBJECT}?sem=${sem}&schoolYearSubjectId=${subjectId}&schoolYearClassId=${classId}`);
   },
+  getTeacherClasses:(yearId:number):Promise<IResponse<any>>=>{
+    return mainAxios.get(`${URL.GET_CLASS_TEACHER}?schoolYearId=${yearId}`)
+  } 
+  ,
+
   updateAtendence:():Promise<IResponse<any>> =>{
     return mainAxios.put(`${URL.CREATE_ATENDENCE}`)
   }

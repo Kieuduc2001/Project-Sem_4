@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { DatePicker, Select, Space, Table, Button, Checkbox, Form, message, Steps } from 'antd';
+import { DatePicker, Select, Space, Table, Button, Checkbox, Form, message } from 'antd';
 import type { TableColumnsType } from 'antd';
 import dayjs from 'dayjs';
 import mainAxios from '../../apis/main-axios';
@@ -14,8 +14,6 @@ import teacherApi from '../../apis/urlApi';
 import TextArea from 'antd/es/input/TextArea';
 import { AttendanceRequestDto, StudentRequestDto } from 'types/request';
 import axios from 'axios';
-import { PlusCircleOutlined, UserAddOutlined } from '@ant-design/icons';
-import { NavLink } from 'react-router-dom';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -25,10 +23,12 @@ const Attendences = () => {
   const { idYear } = useContext(YearContext);
   const [classId, setClassId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [attendenceClass, setAttendenceClass] = useState('attendance-by-day');
   const [form] = Form.useForm();
   const [dayOff, setDayOff] = useState(dayjs());
-  const [currentStep, setCurrentStep] = useState(0);
+  const [disPlaySubmit, setDisplaySubmit] = useState('block');
+  const [disPlayUpdate, setDisplayUpdatet] = useState('none');
+  const [attendancesData, setAttendencesData] = useState<AttendenceData[]>([])
+
   useEffect(() => {
     fetchStudents(true);
   }, [classId]);
@@ -51,9 +51,10 @@ const Attendences = () => {
   }, [dayOff]);
 
   const fetchStudents = async (getStudents: boolean = false): Promise<void> => {
-    form.resetFields(["attendanceStatus", "note"]);
+    form.resetFields(["note"]);
     try {
-      if (schoolYearClass !== null && classId !== null) {
+      if (schoolYearClass !== null && classId !== null && classId !== undefined) {
+
         if (getStudents) {
           const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
           if (studentRes.status === 200) {
@@ -61,6 +62,7 @@ const Attendences = () => {
             if (attendanceRes.status === 200) {
               const studentData = studentRes.data;
               const attendanceData = attendanceRes.data;
+              setAttendencesData(attendanceData);
               setStudent(studentData.map((sd: Student) => {
                 const std: Student = sd;
                 const att = attendanceData.find((att: AttendenceData) => att.studentInfo.studentYearInfoId === sd.id);
@@ -79,13 +81,15 @@ const Attendences = () => {
                 return std;
               }));
             }
-            setCurrentStep(2)
+
           }
         }
       }
     }
     catch (error) {
       setStudent([])
+      console.log(message)
+
     }
   };
 
@@ -94,14 +98,12 @@ const Attendences = () => {
     try {
       const res = await teacherApi.getSchoolYearClass(idYear);
       setSchoolYearClass(res?.data);
-      if (res.status === 200) {
-        setCurrentStep(1)
-      }
+      setClassId(schoolYearClass[0]?.id);
+
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         setSchoolYearClass([]);
         setStudent([]);
-        setCurrentStep(0)
       } else if (error instanceof Error) {
         console.error('Failed to fetch school year classes:', error.message);
       } else {
@@ -176,8 +178,6 @@ const Attendences = () => {
       }) as Student[]
     );
   };
-
-
 
   const columnsAttendenceByDay: TableColumnsType<Student> = [
     {
@@ -254,74 +254,16 @@ const Attendences = () => {
       width: '20%',
       key: 'Ghi_Chu',
       align: 'center',
-      render: (_, record) => (
-        <Form.Item name={['note', record.id]} key={record.id}>
-          <TextArea defaultValue={record.students.attendenceData?.note? record.students.attendenceData?.note : ""} autoSize />
+      render: (_, item) => (
+        console.log("gshdg", item.students.attendenceData?.note),
+        <Form.Item name={['note', item.id]} key={item.id}>
+          <TextArea defaultValue={item.students.attendenceData?.note} autoSize />
         </Form.Item>
-      ),
-    },
-    {
-      title: 'Trạng thái',
-      dataIndex: 'Trang_Thai',
-      width: '14%',
-      key: 'Trang_Thai',
-      align: 'center',
-      render: () => 'chưa thông báo',
-    },
-  ];
-
-  const columnsAttendenceByMonth: TableColumnsType<Student> = [
-    {
-      title: 'Stt',
-      dataIndex: 'Stt',
-      key: 'Stt',
-      width: '5%',
-      align: 'center',
-      render: (_, __, index) => index + 1,
-    },
-    {
-      title: 'Họ tên',
-      dataIndex: 'students',
-      key: 'Ho_Ten',
-      width: '25%',
-      align: 'center',
-      render: (item) => (
-        <>{item.firstName} {item.lastName}</>
-      )
-    },
-    {
-      title: 'Ngày sinh',
-      dataIndex: 'students',
-      key: 'Ngay_sinh',
-      width: '14%',
-      align: 'center',
-      render: (item) => (
-        <>{formatDate(item.birthday)}</>
       )
     }
-    , 
-    {
-      title: 'Tổng Ngày Nghỉ',
-      dataIndex: 'Tong_Ngay_nghi',
-      width: '10%',
-      key: 'Tong_Ngay_nghi',
-      align: 'center',
-    },
-    {
-      title: 'Nghỉ Có Phép',
-      dataIndex: 'Nghi_Co_Phep',
-      width: '10%',
-      key: 'Nghi_Co_Phep',
-      align: 'center',
-    },
-    {
-      title: 'Nghỉ không phép',
-      dataIndex: 'Nghi_Khong_Phep',
-      width: '10%',
-      key: 'Nghi_Khong_Phep',
-      align: 'center',
-    },
   ];
+
+
 
   const handleSubmit = async () => {
     try {
@@ -346,6 +288,8 @@ const Attendences = () => {
       console.log(res);
       await fetchStudents();
       message.success("Điểm danh thành công");
+      setDisplaySubmit('none');
+      setDisplayUpdatet('block')
     } catch (errorInfo) {
       message.error('Điểm danh thất bại');
     }
@@ -393,272 +337,62 @@ const Attendences = () => {
   }).length
 
   return (
+      <Form form={form}>
+        <div>
+          <div style={{ display: 'flex', padding: '16px' }}>
+            <Form.Item className="classId" style={{ marginRight: '14px' }}>
+              <Select placeholder="Chọn lớp học"
+                value={classId} style={{ width: 150 }} onChange={handleChange}>
+                {schoolYearClass.map((classData) => (
+                  <Option key={classData.id} value={classData.id}>
+                    {classData.className}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item className="dayOff" name="dayOff" initialValue={dayOff}> {/* Thêm name cho Form.Item */}
+              <DatePicker
+                defaultValue={dayOff}
+                className="h-10 w-30" onChange={handleChangeDay}
+                format={'M/D/YYYY'}
+                maxDate={dayjs()}
+              />
+            </Form.Item>
 
-    <div className="attendances">
-      {schoolYearClass.length !== 0 && student.length !== 0 ?
-        <>
-          <div className="attendanceItem">
-            <div
-              className={`attendance ${attendenceClass === 'attendance-by-day' ? 'actives' : ''}`}
-              onClick={() => setAttendenceClass('attendance-by-day')}
-            >
-              Điểm danh theo ngày
+            <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
+              Tất cả: {student.length}
             </div>
-            <div
-              className={`attendance ${attendenceClass === 'attendance-by-month' ? 'actives' : ''}`}
-              onClick={() => setAttendenceClass('attendance-by-month')}
-            >
-              Điểm danh theo tháng
+            <div className="border border-solid border-gray-300 w-40 flex justify-center items-center rounded-md h-10">
+              Có mặt: {`${CountStudentpresent}`}
             </div>
-          </div>
-          <Form form={form}>
-            <div className={`${attendenceClass !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
-              <div style={{ display: 'flex', padding: '16px' }}>
-                <Form.Item className="classId" style={{ marginRight: '14px' }}>
-                  <Select placeholder="Chọn lớp học"
-                    value={classId || undefined} style={{ width: 150 }} onChange={handleChange}>
-                    {schoolYearClass.map((classData) => (
-                      <Option key={classData.id} value={classData.id}>
-                        {classData.className}
-                      </Option>
-                    ))} 
-                  </Select>
-                </Form.Item>
-                <Form.Item className="dayOff" name="dayOff" initialValue={dayOff}> {/* Thêm name cho Form.Item */}
-                  <DatePicker
-                    defaultValue={dayOff}
-                    className="h-10 w-30" onChange={handleChangeDay}
-                    format={'M/D/YYYY'}
-                    maxDate={dayjs()}
-                  />
-                </Form.Item>
-
-                <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
-                  Tất cả: {student.length}
-                </div>
-                <div className="border border-solid border-gray-300 w-40 flex justify-center items-center rounded-md h-10">
-                  Có mặt: {`${CountStudentpresent}`}
-                </div>
-                <div className="mx-4 border border-solid border-gray-300 w-45 rounded-md flex items-center justify-center h-10">
-                  Có phép: {`${CountStudentSuspectedPermission}`}
-                </div>
-                <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
-                  Không phép: {`${CountStudentSuspectedNotPermission}`}
-                </div>
-                <div style={{ width: '560px' }}>
-                  <Button type="primary" style={{ float: 'right', background: '#349634' }} onClick={submitUpdateAtendence}>
-                    Sửa Đổi
-                  </Button>
-                </div>
-              </div>
-              {isLoading ? (
-                <Loader />
-              ) : (
-                <div className="list-student">
-                  <Table
-                    columns={columnsAttendenceByDay}
-                    dataSource={student}
-                    pagination={false}
-                    bordered
-                  />
-                </div>
-              )}
-              <div className="submit">
-                <Button type="primary" className="btn-submit" onClick={handleSubmit}>
-                  Lưu Lại
-                </Button>
-              </div>
+            <div className="mx-4 border border-solid border-gray-300 w-45 rounded-md flex items-center justify-center h-10">
+              Có phép: {`${CountStudentSuspectedPermission}`}
             </div>
-          </Form>
-          <div className={`${attendenceClass !== 'attendance-by-month' ? 'hiddens' : 'attendance-by-month'}`}>
-            <div style={{ display: 'flex', padding: '16px' }}>
-              <div style={{ marginRight: '14px' }}>
-                <Select style={{ width: 150 }} onChange={handleChange} value={schoolYearClass[0].id}>
-                  {schoolYearClass.map((classData) => (
-                    <Option key={classData.id} value={classData.id}>
-                      {classData.className}
-                    </Option>
-                  ))}
-                </Select>
-              </div>
-              <Space direction="vertical">
-                <DatePicker disabledDate={(date) => date.isBefore(dayjs())} />
-              </Space>
+            <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
+              Không phép: {`${CountStudentSuspectedNotPermission}`}
             </div>
             <div className="list-student">
               <Table
-                columns={columnsAttendenceByMonth}
+                columns={columnsAttendenceByDay}
                 dataSource={student}
                 pagination={false}
                 bordered
                 scroll={{ y: 385 }}
               />
             </div>
-            <div className="submit">
-              <Button type="primary" className="btn-submit" onClick={handleSubmit}>
-                Lưu Lại
-              </Button>
-            </div>
-            <div className="submit">
-              <Button type="primary" className="btn-submit">
-                Sửa Đổi
-              </Button>
-            </div>
+          )}
+          <div className="submit" style={{ display: `${attendancesData.length>0?disPlayUpdate:disPlaySubmit}` }}>
+            <Button type="primary" className="btn-submit" onClick={handleSubmit}>
+              Lưu Lại
+            </Button>
           </div>
-        </> : <>
-          <div>
-            <h1>Thầy cô vui lòng hoàn thành các bước để điểm danh </h1>
-            <div className="p-4">
-              <Steps current={currentStep}>
-                <Step title="Tạo lớp học" />
-                <Step title="Tạo học sinh" />
-                <Step title="Hoàn thành" />
-              </Steps>
-
-              {currentStep === 0 && (
-                <div className="mt-4">
-                  <Button
-                    type="primary"
-                    icon={<PlusCircleOutlined />}
-                    className={`flex items-center space-x-2 ${schoolYearClass.length !== 0 ? 'bg-green-500' : ''}`}
-                  >
-                    <NavLink to="/classes">
-                      Tạo lớp học
-                    </NavLink>
-                  </Button>
-                </div>
-              )}
-
-              {currentStep === 1 && (
-                <div className="mt-4">
-                  <Button
-                    type="primary"
-                    icon={<UserAddOutlined />}
-                    className={`flex items-center space-x-2 ${student.length !== 0 ? 'bg-green-500' : ''}`}
-                  >
-                    <NavLink to='/students'>
-                      Tạo học sinh
-                    </NavLink>
-                  </Button>
-                </div>
-              )}
-
-              {currentStep === 2 && (
-                <div className="mt-4">
-                  <div className="attendanceItem">
-                    <div
-                      className={`attendance ${attendenceClass === 'attendance-by-day' ? 'actives' : ''}`}
-                      onClick={() => setAttendenceClass('attendance-by-day')}
-                    >
-                      Điểm danh theo ngày
-                    </div>
-                    <div
-                      className={`attendance ${attendenceClass === 'attendance-by-month' ? 'actives' : ''}`}
-                      onClick={() => setAttendenceClass('attendance-by-month')}
-                    >
-                      Điểm danh theo tháng
-                    </div>
-                  </div>
-                  <Form form={form}>
-                    <div className={`${attendenceClass !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
-                      <div style={{ display: 'flex', padding: '16px' }}>
-                        <Form.Item className="classId" style={{ marginRight: '14px' }}>
-                          <Select defaultValue={classId} style={{ width: 150 }} onChange={handleChange}>
-                            {schoolYearClass.map((classData) => (
-                              <Option key={classData.id} value={classData.id}>
-                                {classData.className}
-                              </Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-                        <Form.Item className="dayOff" name="dayOff" initialValue={dayOff}> {/* Thêm name cho Form.Item */}
-                          <DatePicker
-                            defaultValue={dayOff}
-                            className="h-10 w-30" onChange={handleChangeDay}
-                            format={'M/D/YYYY'}
-                            maxDate={dayjs()}
-                          />
-                        </Form.Item>
-
-                        <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
-                          Tất cả: {student.length}
-                        </div>
-                        <div className="border border-solid border-gray-300 w-40 flex justify-center items-center rounded-md h-10">
-                          Có mặt: {`${CountStudentpresent}`}
-                        </div>
-                        <div className="mx-4 border border-solid border-gray-300 w-45 rounded-md flex items-center justify-center h-10">
-                          Có phép: {`${CountStudentSuspectedPermission}`}
-                        </div>
-                        <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
-                          Không phép: {`${CountStudentSuspectedNotPermission}`}
-                        </div>
-                        <div style={{ width: '560px' }}>
-                          <Button type="primary" style={{ float: 'right', background: '#349634' }} onClick={submitUpdateAtendence}>
-                            Sửa Đổi
-                          </Button>
-                        </div>
-                      </div>
-                      {isLoading ? (
-                        <Loader />
-                      ) : (
-                        <div className="list-student">
-                          <Table
-                            columns={columnsAttendenceByDay}
-                            dataSource={student}
-                            pagination={false}
-                            bordered
-                          />
-                        </div>
-                      )}
-                      <div className="submit">
-                        <Button type="primary" className="btn-submit" onClick={handleSubmit}>
-                          Lưu Lại
-                        </Button>
-                      </div>
-                    </div>
-                  </Form>
-                  <div className={`${attendenceClass !== 'attendance-by-month' ? 'hiddens' : 'attendance-by-month'}`}>
-                    <div style={{ display: 'flex', padding: '16px' }}>
-                      <div style={{ marginRight: '14px' }}>
-                        <Select style={{ width: 150 }} onChange={handleChange} value={schoolYearClass[0].id}>
-                          {schoolYearClass.map((classData) => (
-                            <Option key={classData.id} value={classData.id}>
-                              {classData.className}
-                            </Option>
-                          ))}
-                        </Select>
-                      </div>
-                      <Space direction="vertical">
-                        <DatePicker disabledDate={(date) => date.isBefore(dayjs())} />
-                      </Space>
-                    </div>
-                    <div className="list-student">
-                      <Table
-                        columns={columnsAttendenceByMonth}
-                        dataSource={student}
-                        pagination={false}
-                        bordered
-                        scroll={{ y: 385 }}
-                      />
-                    </div>
-                    <div className="submit">
-                      <Button type="primary" className="btn-submit" onClick={handleSubmit}>
-                        Lưu Lại
-                      </Button>
-                    </div>
-                    <div className="submit">
-                      <Button type="primary" className="btn-submit">
-                        Sửa Đổi
-                      </Button>
-                    </div>
-                  </div>                </div>
-              )}
-            </div>
+          <div className="submit" style={{ display: `${attendancesData.length>0?disPlaySubmit:disPlayUpdate}` }}>
+            <Button type="primary" className="btn-submit" onClick={submitUpdateAtendence}>
+              Sửa Đổi
+            </Button>
           </div>
-
-        </>}
-
-    </div>
+        </div>
+      </Form>
   );
 };
 
