@@ -9,7 +9,7 @@ import { YearContext } from '../../src/context/YearProvider/YearProvider';
 import teacherApi from '../apis/urlApi';
 import axios from 'axios';
 import mainAxios from '../apis/main-axios';
-import { Button, Form, Input, Select, Table, TableColumnsType, message } from 'antd';
+import { Button, Form, Input, Result, Select, Table, TableColumnsType, message } from 'antd';
 import dayjs from 'dayjs';
 import { redirect } from 'react-router-dom';
 import { EvaluteRequesDto } from 'types/request';
@@ -55,15 +55,15 @@ const EvaluateCreate = () => {
   const { idYear } = useContext(YearContext);
   const [form] = Form.useForm();
   const [schoolYearClassTeacher, setSchoolYearClassTeacher] = useState<ClassAndSubjectTeacher[]>([]);
-  const [semmerId,setSemmerId] = useState<string>();
-  const [subjectId,setSubjectId] = useState<number>();
+  const [semmerId, setSemmerId] = useState<string>();
+  const [subjectId, setSubjectId] = useState<number>();
   const [isLoading, setIsLoading] = useState(true);
   const [typePoint, setTypePoint] = useState<string>("");
   const [requestDto, setRequestDto] = useState<EvaluteRequesDto>({
     schoolYearClassId: classId!,
     sem: semmerId!,
     studentScoreDetails: [],
-    schoolYearSubjectId:subjectId!
+    schoolYearSubjectId: subjectId!
   });
 
   const fetchStudents = async () => {
@@ -200,8 +200,8 @@ const EvaluateCreate = () => {
   const handleSubmit = async () => {
     try {
       const value = form.validateFields();
-      console.log("value",value);
-    
+      console.log("value", value);
+
       const res = await teacherApi.postEluate(requestDto);
       message.success("Thêm điểm thành công");
     } catch {
@@ -251,10 +251,6 @@ const EvaluateCreate = () => {
               {
                 pattern: /^(\d+|[a-zA-Z]+)$/,
                 message: "Chi duoc nhap so hoac chu !"
-              },
-              {
-                required: true,
-                message: "khong duoc de trong"
               }
             ]}>
             <Input placeholder="Nhập điểm" onChange={(event) => setPoint(event.target.value, record.students.id)} />
@@ -271,7 +267,7 @@ const EvaluateCreate = () => {
           <div style={{ marginRight: '14px', display: "flex" }}>
             <Form.Item name='schoolYearClassId'>
               <Select placeholder="Chọn lớp học"
-                value={classId} style={{ width: 150 }} onChange={handleClassChange}>
+                style={{ width: 150 }} onChange={handleClassChange}>
                 {schoolYearClassTeacher.map((classData, indexClass) => (
                   <Option key={indexClass} value={classData.id} IdGrade={classData.grade.id}>
                     {classData.className}
@@ -294,7 +290,7 @@ const EvaluateCreate = () => {
               <Select placeholder="Chọn kì học"
                 className='ml-1 w-[122px]'
                 onChange={handleSemmerChange}
-                >
+              >
                 {optionSemmer.map((semesters, index) => (
                   <Option key={index} value={semesters.value}>
                     {semesters.label}
@@ -319,19 +315,28 @@ const EvaluateCreate = () => {
             </div>
           </div>
         </div>
-                
-        <Table
-          columns={columnEvaluate}
-          dataSource={student}
-          pagination={false}
-          bordered
-        />
+        {
+          classId ?
+            <>
+              <Table
+                columns={columnEvaluate}
+                dataSource={student}
+                pagination={false}
+                bordered
+              />
+              <div className="submit" >
+                <Button type="primary" className="btn-submit" onClick={handleSubmit}>
+                  Lưu Lại
+                </Button>
+              </div>
+            </>
+
+            : <Result className='mt-20'
+              title="vui lòng chọn lớp học để thêm điểm"
+            />
+        }
       </Form>
-      <div className="submit" >
-        <Button type="primary" className="btn-submit" onClick={handleSubmit}>
-          Lưu Lại
-        </Button>
-      </div>
+
     </div>
   )
 }

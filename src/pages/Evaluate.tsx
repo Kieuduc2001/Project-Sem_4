@@ -165,17 +165,8 @@ const Evaluate = () => {
       width: '14%',
       align: 'center',
       render: (_, item) => (
-        console.log("item", item.students.evaluate?.studentScores),
         <>
-          {
-            item.students.evaluate?.studentScores.studentScores?.DTB.map((DB)=>{
-              <div>
-                  {
-                    DB.score
-                  }
-              </div>
-            })
-          }
+          {item.students.evaluate?.studentScores?.DTB[0]?.score}
         </>
       )
     },
@@ -185,19 +176,19 @@ const Evaluate = () => {
       key: 'DiemKTTX',
       width: '14%',
       align: 'center',
-      render: (_, item) => (
-        <>
-        {
-          item.students.evaluate?.studentScores.studentScores?.DTB.map((DB)=>{
-            <div>
-                {
-                  DB.score
-                }
-            </div>
-          })
-        }
-      </>
-      )
+      render: (_, item) => {
+        console.log(item)
+        return (
+          <>
+            {item.students.evaluate?.studentScores?.KTTX[0] ? item.students.evaluate?.studentScores?.KTTX[0]?.score : ""
+            }
+          </>
+        )
+      }
+
+
+
+
     },
     {
       title: 'Điểm Kiểm Tra Cuối Kì',
@@ -207,14 +198,7 @@ const Evaluate = () => {
       align: 'center',
       render: (_, item) => (
         <>
-          {
-            item.students.evaluate?.studentScores.studentScores?.DTB.map((DB)=>{
-              <div>
-                  {
-                    DB.score
-                  }
-              </div>
-            })
+          {item.students.evaluate?.studentScores?.KT_CUOI_KY[0] ? item.students.evaluate?.studentScores?.KT_CUOI_KY[0]?.score : ""
           }
         </>
       )
@@ -227,16 +211,9 @@ const Evaluate = () => {
       align: 'center',
       render: (_, item) => (
         <>
-        {
-          item.students.evaluate?.studentScores.studentScores?.DTB.map((DB)=>{
-            <div>
-                {
-                  DB.score
-                }
-            </div>
-          })
-        }
-      </>
+          {item.students.evaluate?.studentScores?.KT_GIUA_KY[0] ? item.students.evaluate?.studentScores?.KT_GIUA_KY[0]?.score : ""
+          }
+        </>
       )
     }
   ];
@@ -291,10 +268,9 @@ const Evaluate = () => {
               dataSource={student}
               pagination={false}
               bordered
-              scroll={{ x: 1500, y: 365 }}
             /> :
             <Result className='mt-20'
-              title="vui lòng chọn môn học và lớp học để xem điểm"
+              title="vui lòng chọn môn học , học kì và lớp học để xem điểm"
             />
           }
         </div>

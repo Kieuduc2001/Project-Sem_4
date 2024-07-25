@@ -251,19 +251,24 @@ export interface Acknowledge {
 }
 
 export interface Score {
-  score: string;
+  semesterName: string,
+  pointType: string,
+  id: number,
+  semester: number,
+  score: string
 }
-export interface ScoreTypes {
+export interface StudentScoreSubject {
+  studentScores:ScoreType
+  studentYearInfo:StudentYearInfo
+}
+export interface ScoreType {
   DTB: Array<Score>;
   KTTX: Array<Score>;
   KT_CUOI_KY: Array<Score>;
   KT_GIUA_KY: Array<Score>;
 }
 
-interface StudentScores {
-  id: number;
-  studentScores: ScoreTypes;
-}
+
 
 interface StudentYearInfo {
   studentYearInfoId: number;
@@ -271,7 +276,7 @@ interface StudentYearInfo {
 }
 export interface EvaluateData {
   schoolYearSubject: null,
-  studentScores: StudentScores;
+  studentScores: ScoreType;
   studentYearInfo: StudentYearInfo;
 }
 export interface Student {
@@ -287,7 +292,6 @@ export interface Student {
     studentStatuses: Array<StudentStatus>;
     attendenceData?: AttendenceData;
     evaluate?: EvaluateData;
-    subject?: SubjectProgram;
   }
 }
 
