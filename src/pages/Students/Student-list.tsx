@@ -9,7 +9,7 @@ import {
   notification,
   Select,
   Row,
-  Col,
+  Col
 } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import mainAxios from '../../apis/main-axios';
@@ -26,6 +26,7 @@ export default function Students() {
   const [isLoading, setIsLoading] = useState(true);
   const [form] = Form.useForm();
   const { idYear } = useContext(YearContext);
+  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
 
   useEffect(() => {
     const fetchClass = async () => {
@@ -39,14 +40,28 @@ export default function Students() {
           setSelectedClassId(classData[0].id);
         }
         setIsLoading(false);
-      } catch (error: unknown) {
+      } else if (error instanceof Error) {
+        console.error('Failed to fetch school year classes:', error.message);
+      } else {
+        console.error('An unknown error occurred.');
+      }
+    }
+  };
+
+  const fetchData = async () => {
+    if (idYear === null) return;
+    setIsLoading(true);
+    try {
+        const res = await teacherApi.getSchoolYearClass(idYear);
+        setSchoolYearClass(res?.data || []);
+    } catch (error: unknown) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           setClasses([]);
           setIsLoading(false);
         } else if (error instanceof Error) {
-          console.error('Failed to fetch school year classes:', error.message);
+            console.error('Failed to fetch school year classes:', error.message);
         } else {
-          console.error('An unknown error occurred.');
+            console.error('An unknown error occurred.');
         }
       }
     };
@@ -94,6 +109,7 @@ export default function Students() {
         message: 'Thành công',
       });
       setIsModalOpen(false);
+      fetchStudents();
     } catch (error: any) {
       if (error.response.message) {
         notification.error({ message: error.response.message });
@@ -136,10 +152,10 @@ export default function Students() {
         onCancel={handleCancel}
         footer={[
           <Button key="back" onClick={handleCancel}>
-            Huỷ
+            Cancel
           </Button>,
           <Button key="submit" type="primary" onClick={handleSubmit}>
-            Gửi
+            Submit
           </Button>,
         ]}
       >
@@ -229,17 +245,17 @@ export default function Students() {
         <Table dataSource={students} rowKey="id">
           <Table.Column
             title="Mã học sinh"
-            render={(_, record: Student) => `${record.students.studentCode}`}
+            render={(text, record: Student) => `${record.students.studentCode}`}
           />
           <Table.Column
             title="Họ và tên"
-            render={(_, record: Student) =>
+            render={(text, record: Student) =>
               `${record.students.firstName} ${record.students.lastName}`
             }
           />
           <Table.Column
             title="Ngày sinh"
-            render={(_, record: Student) => {
+            render={(text, record: Student) => {
               const date = new Date(record.students.birthday);
               const day = String(date.getDate()).padStart(2, '0');
               const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
@@ -249,11 +265,11 @@ export default function Students() {
           />
           <Table.Column
             title="Giới tính"
-            render={(_, record: Student) => `${record.students.studentCode}`}
+            render={(text, record: Student) => `${record.students.studentCode}`}
           />
           <Table.Column
             title="Địa chỉ"
-            render={(_, record: Student) => `${record.students.address}`}
+            render={(text, record: Student) => `${record.students.address}`}
           />
           <Table.Column title="Trạng thái" render={renderStudentStatuses} />
         </Table>

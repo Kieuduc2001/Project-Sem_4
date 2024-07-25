@@ -172,6 +172,7 @@ const App = () => {
             dataIndex: 'content',
             key: 'content',
             render: (content: string | null) => content || '-',
+
         },
     ];
 

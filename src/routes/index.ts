@@ -40,7 +40,6 @@ const Acknowledge = lazy(() => import('../pages/Acknowledge'));
 const Evaluate = lazy(() => import('../pages/Evaluate'));
 
 const FeeSign = lazy(() => import('../pages/Fee/Fee-sign'));
-const FeeList = lazy(() => import('../pages/Fee/Fee-list'));
 
 const HwList = lazy(() => import('../pages/Homework/List-hw'));
 const HwDetails = lazy(() => import('../pages/Homework/Hw-details'));
@@ -48,6 +47,8 @@ const HwDetails = lazy(() => import('../pages/Homework/Hw-details'));
 
 
 
+const FeeList = lazy(() => import('../pages/Fee/Fee-list'));
+const EvaluteCreate = lazy(()=>import('../pages/EvaluteCreate'));
 export const coreRoutes: RouteConfig[] = [
   {
     path: '/students',
@@ -173,6 +174,12 @@ export const coreRoutes: RouteConfig[] = [
     path: '/profile',
     component: Profile,
     title: 'Fee',
+    roles: ['ROLE_BGH', 'ROLE_GV'],
+  },
+  {
+    path: '/evaluteCreate',
+    component: EvaluteCreate,
+    title: 'Evalute Create',
     roles: ['ROLE_BGH', 'ROLE_GV'],
   },
 ];
