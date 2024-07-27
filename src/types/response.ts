@@ -120,7 +120,7 @@ export interface SchoolYearClassData {
   className: string;
   classCode: string;
   grade: {
-    id: number; 
+    id: number;
     name: string;
   };
   room: {
@@ -139,17 +139,17 @@ export interface SchoolYearClassAndSubEntrusted {
   classList: SchoolYearClassEntrusted[]
 }
 export interface SchoolYearSubEntrusted {
-  id: number,
-  subject: {
     id: number,
-    code: string,
-    type: string,
-    subjectPointType: string,
-    description: null,
-    name: string,
-    numberType: boolean
-  },
-  schoolYear: null
+    subject: {
+      id: number,
+      code: string,
+      type: string,
+      subjectPointType: string,
+      description: null,
+      name: string,
+      numberType: boolean
+    },
+    schoolYear: null
 }
 export interface SchoolYearClassEntrusted {
 
@@ -249,36 +249,25 @@ export interface Acknowledge {
   id: number,
   Acknowledge: string
 }
-
-export interface Score {
-  semesterName: string,
-  pointType: string,
-  id: number,
-  semester: number,
-  score: string
-}
-export interface StudentScoreSubject {
-  studentScores:ScoreType
-  studentYearInfo:StudentYearInfo
-}
-export interface ScoreType {
-  DTB: Array<Score>;
-  KTTX: Array<Score>;
-  KT_CUOI_KY: Array<Score>;
-  KT_GIUA_KY: Array<Score>;
-}
-
-
-
-interface StudentYearInfo {
-  studentYearInfoId: number;
-  fullName: string;
+export interface ScoreTypes {
+  DTB: number[] | undefined;
+  KTTX: number[] | undefined;
+  KT_CUOI_KY: number[] | undefined;
+  KT_GIUA_KY: number[] | undefined;
 }
 export interface EvaluateData {
-  schoolYearSubject: null,
-  studentScores: ScoreType;
-  studentYearInfo: StudentYearInfo
-
+  studentScores: ScoreTypes;
+  id: number;
+  note: string;
+  semester: string;
+  semesterName: string;
+  status: string;
+  studentYearInfo: {
+    studentYearInfoId?: number,
+    fullName: string,
+    classId: number,
+    birthday: string
+  }
 }
 export interface Student {
   id: number,
@@ -293,7 +282,7 @@ export interface Student {
     studentStatuses: Array<StudentStatus>;
     attendenceData?: AttendenceData;
     evaluate?: EvaluateData;
-
+    subject?: SubjectProgram;
   }
 }
 
@@ -636,6 +625,9 @@ export interface HomeworkTeacher {
     schoolYear: string | null;
   };
   teacherSchoolYearClassSubject: number;
+
+}
+
 }
 export interface AttendenceData {
   id: number,

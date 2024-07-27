@@ -5,7 +5,6 @@ import { Select } from 'antd';
 import type {
   EvaluateData,
   SchoolYearClassAndSubEntrusted,
-  SchoolYearClassData,
   SchoolYearClassEntrusted,
   Student,
   SubjectProgram,
@@ -15,7 +14,7 @@ import teacherApi from '../apis/urlApi';
 import axios from 'axios';
 import mainAxios from '../apis/main-axios';
 import { NavLink } from 'react-router-dom';
-import Students from './Students/Student-list';
+import { number } from 'yup';
 
 const { Option } = Select;
 const optionSemmer = [
@@ -36,7 +35,7 @@ const Evaluate = () => {
   const [student, setStudent] = useState<Student[]>([]);
   const [classId, setClassId] = useState<number>();
   const { idYear } = useContext(YearContext);
-  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
+  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassEntrusted[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [idGrade, setIdGrade] = useState<number | null>(1);
   const [semester, setSemester] = useState<string>("HOC_KI_1");
@@ -50,17 +49,15 @@ const Evaluate = () => {
   }, [idYear])
   useEffect(() => {
     fetchSchoolYearClassData();
-    fetchStudents(true);
   }, [subjectIdGrade])
   const fetchSchoolYearClassData = async () => {
     if (idYear === null) return;
     try {
-      const res = await teacherApi.getSchoolYearClass(idYear);
-      setSchoolYearClass(res?.data);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        setSchoolYearClass([]);
-        setStudent([]);
+      const res = await teacherApi.getSchoolYearClassEntrusted(idYear, semester);
+      const classSchoolYearSubject = res.data;
+      let SchoolYearSubjectData = classSchoolYearSubject.filter((clss: SchoolYearClassAndSubEntrusted) => clss.schoolYearSubject.id === subjectIdGrade);
+        setSchoolYearClass(cls.classList)
+      })
       } else if (error instanceof Error) {
         console.error('Failed to fetch school year classes:', error.message);
       } else {
@@ -71,20 +68,19 @@ const Evaluate = () => {
       setIsLoading(false);
     }
   };
+
   const fetchStudents = async (getStudents: boolean = false): Promise<void> => {
     try {
       if (schoolYearClass !== undefined && classId !== undefined) {
         if (getStudents) {
           const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
           if (studentRes.status === 200) {
-            const evaluateRes = await teacherApi.getEvaluateSubject(classId, subjectIdGrade, semester)
-            console.log("evaluateRes", evaluateRes)
+            const evaluateRes = await teacherApi.getEvaluateSubject(classId, subjectIdGrade, semester);
             if (evaluateRes.status === 200) {
               const newStudent = studentRes.data.map((sd: Student) => {
                 sd.students.evaluate = evaluateRes.data.studentScoreSubject.find((el: EvaluateData) => el.studentYearInfo.studentYearInfoId === sd.id);
                 return sd;
               });
-              console.log("newStudent", newStudent)
               setStudent(newStudent);
             }
           }
@@ -104,7 +100,6 @@ const Evaluate = () => {
       const res = await teacherApi.getSchoolYearSubjectGrade(idGrade);
       setSubjectGradeSchoolYear(res.data);
     }
-
   }
 
   const handleClassChange = (value: number, option: any) => {
@@ -117,6 +112,9 @@ const Evaluate = () => {
     fetchStudents(true)
 
   };
+  const handleSemmerChange = (value: string) => {
+    setSemester(value);
+  };
   const formatDate = (dateString: string) => {
     const dateObject = new Date(dateString);
     const day = String(dateObject.getDate()).padStart(2, '0');
@@ -126,7 +124,16 @@ const Evaluate = () => {
   };
   const handleSubjectClassChange = (value: number) => {
     setSubjectGrade(value);
-    fetchStudents(true)
+  }
+  const chooseSubject = async (idSubject: number) => {
+    setSubjectGrade(idSubject);
+    const res = await teacherApi.getSchoolYearClassEntrusted(idYear, semester);
+    const classSchoolYearSubject = res.data;
+    let SchoolYearSubjectData = classSchoolYearSubject.filter((clss: SchoolYearClassAndSubEntrusted) => clss.schoolYearSubject.id === idSubject);
+    SchoolYearSubjectData.forEach((cls: SchoolYearClassAndSubEntrusted) => {
+      setSchoolYearClass(cls.classList)
+    })
+
   }
   const columnEvaluate: TableColumnsType<Student> = [
     {
@@ -145,7 +152,6 @@ const Evaluate = () => {
       align: 'center',
       render: (_, item) => (
         <>{item.students.firstName} {item.students.lastName}</>
-
       )
     },
     {
@@ -159,169 +165,105 @@ const Evaluate = () => {
       )
     },
     {
-      title: 'Điểm Trung Bình',
       dataIndex: 'students',
-      key: 'DiemTrungBinh',
+      key: 'Diem',
       width: '14%',
       align: 'center',
       render: (_, item) => (
-        <>
-          {item.students.evaluate?.studentScores?.DTB[0]?.score}
-        </>
+        <>{item.students.evaluate?.studentScores.DTB}</>
       )
     },
     {
       title: 'Điểm Kiểm Tra Thường Xuyên',
       dataIndex: 'students',
-      key: 'DiemKTTX',
-      width: '14%',
-      align: 'center',
-      render: (_, item) => {
-        console.log(item)
-        return (
-          <>
-            {item.students.evaluate?.studentScores?.KTTX[0] ? item.students.evaluate?.studentScores?.KTTX[0]?.score : ""
-            }
-          </>
-        )
-      }
-
-
-
-
-    },
-    {
-      title: 'Điểm Kiểm Tra Cuối Kì',
-      dataIndex: 'students',
-      key: 'DiemKTCK',
+      key: 'Diem',
       width: '14%',
       align: 'center',
       render: (_, item) => (
-        <>
-          {item.students.evaluate?.studentScores?.KT_CUOI_KY[0] ? item.students.evaluate?.studentScores?.KT_CUOI_KY[0]?.score : ""
-          }
-        </>
+        <>{item.students.evaluate?.studentScores.KTTX}</>
       )
     },
     {
-      title: 'Điểm Kiểm Tra Giữa Kì',
+      title: 'Điểm Kiểm Tra Cuối Kì ',
       dataIndex: 'students',
-      key: 'DiemKTGK',
+      key: 'Diem',
       width: '14%',
       align: 'center',
       render: (_, item) => (
-        <>
-          {item.students.evaluate?.studentScores?.KT_GIUA_KY[0] ? item.students.evaluate?.studentScores?.KT_GIUA_KY[0]?.score : ""
-          }
-        </>
+        <>{item.students.evaluate?.studentScores.KT_CUOI_KY}</>
       )
-    }
-  ];
-  return (
-    <div className="evaluate ">
-      <div>
-        <div style={{ display: 'flex', padding: '16px' }}>
-          <div style={{ marginRight: '14px', display: "flex" }}>
-            <Select placeholder="Chọn môn học"
-              className='mr-1'
-              style={{ width: 150 }} onChange={handleSubjectClassChange}>
-              {subbjectGradeSchoolYear.map(subData => (
-                <Option key={subData.id} value={subData.schoolYearSubject.id}>
-                  {subData.schoolYearSubject.subject.name}
-                </Option>
-              ))}
-            </Select>
-            <Select placeholder="Chọn lớp học"
-              style={{ width: 150 }} onChange={handleClassChange}>
-              {schoolYearClass.map(classData => (
-                <Option key={classData.id} value={classData.id}>
-    {classData.className}
-                </Option>
-              ))}
-            </Select>
-            <Select placeholder="Chọn kì học"
-              className='ml-1'
-              value={semester}
-              onChange={handleSemmerChange}>
-              {optionSemmer.map(semesters => (
-                <Option key={semesters.value} value={semesters.value}>
-                  {semesters.label}
-                </Option>
-              ))}
-            </Select>
-          </div>
+    },
+    {
+      title: 'Điểm Kiểm Tra Giữa Kì ',
+      dataIndex: 'students',
+      key: 'Diem',
+      width: '14%',
+      align: 'center',
+      render: (_, item) => (
+        <>{item.students.evaluate?.studentScores.DTB}</>
+      )
+=======
+      )
+    },
+    {
+              <div>
+          <div style={{ display: 'flex', padding: '16px' }}>
+            <div style={{ marginRight: '14px', display: "flex" }}>
+              <Select placeholder="Chọn môn học"
+                className='mr-1'
+                style={{ width: 150 }} onChange={handleSubjectClassChange}>
+                {subbjectGradeSchoolYear.map((subData, indexSubject) => (
+                  <Option key={indexSubject} value={subData.schoolYearSubject.id}>
+                    {subData.schoolYearSubject.subject.name}
+                  </Option>
+                ))}
+              </Select>
+              <Select placeholder="Chọn lớp học"
+                style={{ width: 150 }} onChange={handleClassChange}>
+                {schoolYearClass.map((classData, indextClass) => (
+                  <Option key={indextClass} value={classData.classInfo?.id}>
+                    {classData.classInfo?.className}
+                  </Option>
+                ))}
+              </Select>
+              <Select placeholder="Chọn kì học"
+                className='ml-1'
+                value={semester}
+                onChange={handleSemmerChange}>
+                {optionSemmer.map((semesters, index) => (
+                  <Option key={index} value={semesters.value}>
+                    {semesters.label}
+                  </Option>
+                ))}
+              </Select>
+            </div>
 
-          <div style={{ width: '100%' }}>
-            <NavLink
-              to='/evaluteCreate'
-              style={{ float: 'right', background: '#1677ff', alignContent: 'center' }}
-              className='float-right bg-green-600 text-center text-white h-8 w-24 rounded'
-            >
-              Thêm điểm
-            </NavLink>
+            <div style={{ width: '100%' }}>
+              <NavLink
+                to='/evaluteCreate'
+                style={{ float: 'right', background: '#1677ff', alignContent: 'center' }}
+                className='float-right bg-green-600 text-center text-white h-8 w-24 rounded'
+              >
+                Thêm điểm
+              </NavLink>
+            </div>
           </div>
-        </div>
-        <div>
+          <div>
           {classId && subjectIdGrade && semester ?
+
             <Table
               columns={columnEvaluate}
               dataSource={student}
               pagination={false}
               bordered
+              scroll={{ x: 1500, y: 365 }}
             /> :
             <Result className='mt-20'
-              title="vui lòng chọn môn học , học kì và lớp học để xem điểm"
-            />
+            title="vui lòng chọn môn học và lớp học để xem điểm"
+          />
           }
+          </div>
         </div>
-      </div>
-      <Modal
-        open={open}
-        title="Nhận xét nhanh"
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={[
-          <Button key="back" onClick={handleCancel}>
-            Huỷ bỏ
-          </Button>,
-          <Button
-            key="submit"
-            type="primary"
-            loading={loading}
-            onClick={handleOk}
-            style={{ background: 'rgb(52, 150, 52' }}
-          >
-            Lưu
-          </Button>,
-        ]}
-      >
-        <div>
-          <p>
-            nhập điểm
-          </p>
-
-        </div>
-        <Form style={{ marginTop: '15px' }}>
-          <Form.Item
-            name={'studentYearInfoId'}
-            rules={[
-              { required: true, message: 'Vui lòng chọn học sinh!' },
-            ]}
-            label="Thêm điểm cho học sinh"
-          >
-            <Select>
-              {student.map((st) => (
-                <Select.Option key={st.students.id} value={st.students.id}>
-                  {st.students.lastName + st.students.lastName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item>
-
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };

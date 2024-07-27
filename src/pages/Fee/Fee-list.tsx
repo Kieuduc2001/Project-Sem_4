@@ -12,12 +12,11 @@ import {
     Select
 } from 'antd';
 import teacherApi from '../../apis/urlApi';
-import {
-    FeeList,
-} from '../../types/response';
+import { FeeList } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
 import Loader from '../../common/Loader';
 import axios from 'axios';
+import { number } from 'yup';
 
 const { Option } = Select;
 
@@ -48,27 +47,31 @@ export default function SchoolYearClass() {
     const [unit, setUnit] = useState<any[]>([]);
     const [grade, setGrades] = useState<any[]>([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (idYear === null) return;
-            setIsLoading(true);
-            try {
-                const res = await teacherApi.getFeeList(idYear);
-                setFee(res.data);
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status === 404) {
-                    setFee([]);
-                } else if (error instanceof Error) {
-                    console.error('Failed to fetch:', error.message);
-                } else {
-                    console.error('An unknown error occurred.');
-                }
-            } finally {
-                setIsLoading(false);
+
+    const fetchData = async (idYear: any) => {
+        if (idYear === null) return;
+        setIsLoading(true);
+        try {
+            const res = await teacherApi.getFeeList(idYear);
+            setFee(res.data);
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
+                setFee([]);
+            } else if (error instanceof Error) {
+                console.error('Failed to fetch:', error.message);
+            } else {
+                console.error('An unknown error occurred.');
             }
-        };
-        fetchData();
-    }, [idYear]);
+        } finally {
+            setIsLoading(false);
+        }
+
+    };
+
+    useEffect(() => {
+        handleSubmit();
+        fetchData(idYear);
+    }, [idYear])
 
     useEffect(() => {
         const fetchPaymentTime = async () => {
@@ -109,12 +112,11 @@ export default function SchoolYearClass() {
             } catch (error) {
                 console.error('Error fetching grade:', error);
             } finally {
-                setIsLoading(false)
+                setIsLoading(false);
             }
         };
         fetchGrades();
     }, []);
-
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -149,13 +151,21 @@ export default function SchoolYearClass() {
 
             const res = await teacherApi.postFeeList(dataToSubmit);
             setIsModalOpen(false);
-            message.success('Data submitted successfully!');
+            message.success('Tạo thành công!');
             setFee([...fee, res?.data]);
+            fetchData(idYear);
         } catch (error) {
             console.error('Error:', error);
-            message.error('Failed to submit data. Please try again later.');
         }
     };
+
+    const gradeMap = {
+        1: "Khối 1",
+        2: "Khối 2",
+        3: "Khối 3",
+        4: "Khối 4",
+        5: "Khối 5",
+    } as { [key: number]: string };
 
     return (
         <div className="p-4 md:p-6 2xl:p-10">
@@ -242,7 +252,7 @@ export default function SchoolYearClass() {
                         rules={[{ required: true, message: 'Please select the payment time!' }]}
                     >
                         <Select>
-                            {paymentTime.map((time) => (
+                            {paymentTime?.map((time) => (
                                 <Option key={time.id} value={time.id}>
                                     {time.name}
                                 </Option>
@@ -252,7 +262,7 @@ export default function SchoolYearClass() {
                     <Form.List name="feePriceList">
                         {(fields, { add, remove }) => (
                             <>
-                                {fields.map(({ key, name, fieldKey = `${key}`, ...restField }) => (
+                                {fields?.map(({ key, name, fieldKey = `${key}`, ...restField }) => (
                                     <Row gutter={16} key={key}>
                                         <Col span={8}>
                                             <Form.Item
@@ -272,7 +282,7 @@ export default function SchoolYearClass() {
                                                 rules={[{ required: true, message: 'Please enter the grade ID!' }]}
                                             >
                                                 <Select placeholder='Khối'>
-                                                    {grade.map((grade) => (
+                                                    {grade?.map((grade) => (
                                                         <Select.Option key={grade.id} value={grade.id}>
                                                             {grade.name}
                                                         </Select.Option>
@@ -288,7 +298,7 @@ export default function SchoolYearClass() {
                                                 rules={[{ required: true, message: 'Please select the unit!' }]}
                                             >
                                                 <Select placeholder='Đơn vị'>
-                                                    {unit.map((time) => (
+                                                    {unit?.map((time) => (
                                                         <Option key={time.id} value={time.id}>
                                                             {time.name}
                                                         </Option>
@@ -318,19 +328,57 @@ export default function SchoolYearClass() {
             ) : (
                 <div>
                     <Row justify="space-between" className="mb-6">
-                        <Table dataSource={fee} rowKey={(record) => (record.id !== undefined ? record.id : `temp-key-${record.title}`)} scroll={{ y: 450 }} className="w-full">
+                        <Table
+                            dataSource={fee}
+                            rowKey={(record) => (record.id !== undefined ? record.id : `temp-key-${record.title}`)}
+                            scroll={{ y: 450 }}
+                            className="w-full"
+                        >
                             <Table.Column title="Tên khoản thu" dataIndex="title" />
-                            <Table.Column
-                                title="Đơn giá"
-                                dataIndex="feePrices"
-                                render={(feePrices: FeePrice[]) =>
-                                    feePrices.map((price: FeePrice, index: number) => (
-                                        <div key={index}>
-                                            {price.price}/{price.unit.name}
-                                        </div>
-                                    ))
-                                }
-                            />
+                            <Table.ColumnGroup title="Đơn giá">
+                                <Table.Column
+                                    title="Giá"
+                                    dataIndex="feePrices"
+                                    key="price"
+                                    render={(feePrices: FeePrice[]) => (
+                                        <>
+                                            {feePrices?.map((price: FeePrice, index: number) => (
+                                                <div className='mb-1 mt-1 border-b-2 border-bodydark1' key={index}>
+                                                    {price.price}
+                                                </div>
+                                            ))}
+                                        </>
+                                    )}
+                                />
+                                <Table.Column
+                                    title="Đơn vị"
+                                    dataIndex="feePrices"
+                                    key="unit"
+                                    render={(feePrices: FeePrice[]) => (
+                                        <>
+                                            {feePrices?.map((price: FeePrice, index: number) => (
+                                                <div className='mb-1 mt-1 border-b-2 border-bodydark1' key={index}>
+                                                    {price.unit.name}
+                                                </div>
+                                            ))}
+                                        </>
+                                    )}
+                                />
+                                <Table.Column
+                                    title="Khối"
+                                    dataIndex="feePrices"
+                                    key="gradeId"
+                                    render={(feePrices: FeePrice[]) => (
+                                        <>
+                                            {feePrices?.map((price: FeePrice, index: number) => (
+                                                <div className='mb-1 mt-1 border-b-2 border-bodydark1' key={index}>
+                                                    {gradeMap[price.gradeId] || price.gradeId}
+                                                </div>
+                                            ))}
+                                        </>
+                                    )}
+                                />
+                            </Table.ColumnGroup>
                             <Table.Column title="Kỳ thu" dataIndex="termName" />
                             <Table.Column
                                 title="Thời gian thu"

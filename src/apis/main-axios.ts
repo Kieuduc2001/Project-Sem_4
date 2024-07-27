@@ -52,7 +52,7 @@ mainAxios.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.token}`;
         return axios(originalRequest);
       } catch (refreshError) {
-        // Xử lý lỗi khi không thể refresh token (ví dụ: token hết hạn)
+
         console.error('Could not refresh token:', refreshError);
         // Đăng xuất người dùng hoặc xử lý lỗi một cách phù hợp
         // Ví dụ: dispatch một hành động để đăng xuất người dùng

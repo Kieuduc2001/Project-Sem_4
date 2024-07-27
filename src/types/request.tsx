@@ -10,7 +10,7 @@ export interface StudentRequestDto {
   note: string;
   id?: number
 }
-export interface EvaluteRequesDto {
+export interface EvaluteDto {
   schoolYearSubjectId?: number,
   schoolYearClassId: number,
   sem: string,
@@ -21,5 +21,4 @@ export interface EvaluteRequesDto {
       pointType: string
     }[]
   }[]
-
 }

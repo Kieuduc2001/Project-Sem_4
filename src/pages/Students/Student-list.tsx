@@ -9,7 +9,8 @@ import {
   notification,
   Select,
   Row,
-  Col
+  Col,
+
 } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import mainAxios from '../../apis/main-axios';
@@ -39,34 +40,24 @@ export default function Students() {
         if (classData.length > 0) {
           setSelectedClassId(classData[0].id);
         }
-        setIsLoading(false);
-      } else if (error instanceof Error) {
-        console.error('Failed to fetch school year classes:', error.message);
-      } else {
-        console.error('An unknown error occurred.');
-      }
-    }
-  };
 
-  const fetchData = async () => {
-    if (idYear === null) return;
-    setIsLoading(true);
-    try {
-        const res = await teacherApi.getSchoolYearClass(idYear);
-        setSchoolYearClass(res?.data || []);
-    } catch (error: unknown) {
+        setIsLoading(false);
+      } catch (error: unknown) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           setClasses([]);
           setIsLoading(false);
         } else if (error instanceof Error) {
-            console.error('Failed to fetch school year classes:', error.message);
+          console.error('Failed to fetch students:', error.message);
         } else {
-            console.error('An unknown error occurred.');
+          console.error('An unknown error occurred.');
         }
       }
     };
     fetchClass();
   }, [idYear]);
+
+
+
 
   useEffect(() => {
     const fetchStudentsByClass = async () => {
@@ -89,6 +80,7 @@ export default function Students() {
     };
     fetchStudentsByClass();
   }, [selectedClassId]);
+
 
   // Function to open the modal
   const [isModalOpen, setIsModalOpen] = useState(false);
