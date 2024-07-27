@@ -625,6 +625,9 @@ export interface HomeworkTeacher {
     schoolYear: string | null;
   };
   teacherSchoolYearClassSubject: number;
+
+}
+
 }
 export interface AttendenceData {
   id: number,
