@@ -488,93 +488,32 @@ export interface FeeList {
 export interface FeePeriodResponse {
   id: number;
   title: string;
-  content: string;
+  content: string | null;
   status: boolean;
   statusCode: string;
   endDate: string;
   createdAt: string;
-  schoolyear: {
-    id: number;
-    startSem1: string;
-    startSem2: string;
-    end: string;
-  };
-  schoolyearfees: {
-    id: number;
-    title: string;
-    term: string;
-    termName: string;
-    compel: boolean;
-    status: boolean;
-    refund: boolean;
-    exemption: boolean;
-    paymentTime: {
+  classList: {
+    schoolYearClass: {
       id: number;
-      name: string;
-      time: number;
-    };
-    schoolyear: {
-      id: number;
-      startSem1: string;
-      startSem2: string;
-      end: string;
-    };
-    feePrices: {
-      id: number;
-      price: number;
-      gradeId: number | null;
-      unit: {
+      className: string;
+      classCode: string;
+      grade: {
         id: number;
         name: string;
-        code: string;
       };
-    }[];
-  }[];
-  feePeriodScopes: {
-    id: number;
-    objectId: number;
-    scope: {
-      id: number;
-      name: string;
-      code: string;
+      room: string | null;
+      teacherSchoolYear: string | null;
+      schoolYear: string | null;
     };
+    totalStudent: number;
+    totalPaid: number;
   }[];
-  schoolYearFeePeriods: {
-    id: number;
-    amount: number;
-    schoolyearfee: {
-      id: number;
-      title: string;
-      term: string;
-      termName: string;
-      compel: boolean;
-      status: boolean;
-      refund: boolean;
-      exemption: boolean;
-      paymentTime: {
-        id: number;
-        name: string;
-        time: number;
-      };
-      schoolyear: {
-        id: number;
-        startSem1: string;
-        startSem2: string;
-        end: string;
-      };
-      feePrices: {
-        id: number;
-        price: number;
-        gradeId: number | null;
-        unit: {
-          id: number;
-          name: string;
-          code: string;
-        };
-      }[];
-    };
-  }[];
+  totalTrans: number;
+  totalPaid: number;
 }
+
+
 
 export interface FeeScope {
   paymentTimeList: {
@@ -592,6 +531,111 @@ export interface FeeScope {
     name: string;
     code: string;
   }[];
+}
+
+export interface HomeworkResponse {
+  headers: Record<string, any>;
+  body: {
+    id: number;
+    title: string;
+    content: string;
+    description: string | null;
+    status: boolean;
+    statusName: string;
+    url: string;
+    dueDate: string;
+    subject: {
+      id: number;
+      code: string;
+      type: string;
+      subjectPointType: string;
+      description: string | null;
+      name: string;
+      numberType: boolean;
+    };
+    class: {
+      id: number;
+      className: string;
+      classCode: string;
+      grade: {
+        id: number;
+        name: string;
+      };
+      room: string | null;
+      teacherSchoolYear: string | null;
+      schoolYear: string | null;
+    };
+    studentSubmission: string;
+    homeworkImageUrls: string[];
+  }[];
+  statusCode: string;
+  statusCodeValue: number;
+}
+
+export interface HomeworkDetailsResponse {
+  id: number;
+  title: string;
+  content: string;
+  dueDate: string;
+  description: string | null;
+  url: string;
+  status: boolean;
+  statusName: string;
+  overdue: boolean;
+  homeworkImageUrls: string[];
+  studentYearHomeWorks: {
+    id: number;
+    description: string;
+    url: string;
+    submitTime: string;
+    status: boolean;
+    statusName: string | null;
+    point: number;
+    studentYearInfoId: {
+      studentYearInfoId: number;
+      studentCode: string;
+      fullName: string;
+      gender: boolean | null;
+      birthday: string | null;
+      className: string;
+      classId: number;
+    };
+    imageUrl: string[];
+    subjectName: string | null;
+    teacherName: string | null;
+  }[];
+  submission: boolean;
+  subject: string | null;
+  teacherInfo: string | null;
+}
+
+export interface HomeworkTeacher {
+  schoolYearClass: {
+    id: number;
+    className: string;
+    classCode: string;
+    grade: {
+      id: number;
+      name: string;
+    };
+    room: string | null;
+    teacherSchoolYear: string | null;
+    schoolYear: string | null;
+  };
+  schoolYearSubject: {
+    id: number;
+    subject: {
+      id: number;
+      code: string;
+      type: string;
+      subjectPointType: string;
+      description: string | null;
+      name: string;
+      numberType: boolean;
+    };
+    schoolYear: string | null;
+  };
+  teacherSchoolYearClassSubject: number;
 }
 export interface AttendenceData {
   id: number,
