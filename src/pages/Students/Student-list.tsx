@@ -42,6 +42,10 @@ export default function Students() {
       } catch (error: unknown) {
 
 
+
+
+
+
         if (axios.isAxiosError(error) && error.response?.status === 404) {
           setClasses([]);
           setIsLoading(false);
