@@ -1,15 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom/client";
 import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux'; // Import Provider from react-redux
+import { Provider } from 'react-redux'; 
 import { store } from './redux/store';
 import App from './App';
 import './style/mainStyle.css';
 import './index.css';
 import './satoshi.css';
+import "./index.css";
+
 import YearProvider from './context/YearProvider/YearProvider';
 
-ReactDOM.render(
+const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+root.render(
   <React.StrictMode>
     <Provider store={store}>
       <YearProvider>
@@ -19,5 +22,4 @@ ReactDOM.render(
       </YearProvider>
     </Provider>
   </React.StrictMode>,
-  document.getElementById('root')
 );

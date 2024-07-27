@@ -8,6 +8,7 @@ import { Storage } from './contstants/storage';
 import { getLocalStorageItem } from './utils/storage/local-storage';
 import { getMessagingDeviceToken, onMessageListener } from '../public/firebase';
 
+
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
 const NotFound = lazy(() => import('./pages/404page'));
 const SignIn = lazy(() => import('./pages/Authentication/SignIn'));

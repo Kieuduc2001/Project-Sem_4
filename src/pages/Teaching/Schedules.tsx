@@ -195,6 +195,7 @@ const Timetable: React.FC = () => {
     }
   };
 
+
   if (isLoading) {
     return <Loader />;
   }

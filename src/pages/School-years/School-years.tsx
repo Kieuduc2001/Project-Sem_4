@@ -25,7 +25,6 @@ export default function SchoolYears() {
     fetchData();
     console.log('aaaa', fetchData);
   }, []);
-
   const fetchData = async () => {
     try {
       setIsLoading(true);
