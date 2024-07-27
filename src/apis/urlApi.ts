@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { AttendanceRequestDto, EvaluteDto } from 'types/request';
+=======
+import { AttendanceRequestDto, EvaluteRequesDto } from 'types/request';
+
+>>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
 import { IResponse } from '../types/response';
 import mainAxios from './main-axios';
 
@@ -33,6 +38,15 @@ enum URL {
   GET_SCHEDULE_SUBJECTS = '/api/v1/schedule/get-teacher-class-subject',
   //Fee
   GET_FEE_LIST = '/api/v1/school-year-fee/getBy',
+  CREATE_FEE = '/api/v1/school-year-fee/create',
+  GET_FEE_PERIOD = '/api/v1/fee-period/getBy',
+  CREATE_FEE_PERIOD = '/api/v1/fee-period/create',
+  GET_SCOPES = '/api/v1/school-year-fee/getUnitScopePaymentMethod',
+  //Homework
+  GET_HOMEWORK = '/api/v1/getHomeWorksByTeacherSchoolYearClassSubject',
+  GET_HOMEWORK_DETAILS = '/api/v1/getHomeWorkDetail',
+  GET_TEACHER_FOR_HOMEWROK = '/api/v1/school/teacher-school-year-class-subject-by-teacher',
+  CREATE_HOMEWORK = '/api/v1/createHomeWork',
   GET_Attendence = '/api/v1/student/get-attendance',
   GET_EVALUATE_SUBJECT ='/api/v1/student-score/get-student-score-subject',
 
@@ -146,6 +160,9 @@ const teacherApi = {
   getStudents: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_STUDENTS_YEARS}?bySchoolYearId=${id}`);
   },
+  getStudentByClass: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_STUDENTS_YEARS}?bySchoolYearClassId=${id}`);
+  },
   getSchedule: (): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_SCHEDULE}`)
   },
@@ -161,10 +178,28 @@ const teacherApi = {
   getEvaluateSubject:(classId:number|undefined,subjectId:number|undefined,sem:string):Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_EVALUATE_SUBJECT}?sem=${sem}&schoolYearSubjectId=${subjectId}&schoolYearClassId=${classId}`);
   },
+  getHomework: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_HOMEWORK}?teacherSchoolYearClassSubjectId=${id}`)
+  },
+  getHomeworkDetails: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_HOMEWORK_DETAILS}?homeWorkId=${id}`)
+  },
+  getHomeworkTeacher: (id: number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_TEACHER_FOR_HOMEWROK}?schoolYearId=${id}`)
+  },
+  postCreateHomework: (formData: FormData): Promise<IResponse<any>> => {
+    return mainAxios.post(URL.CREATE_HOMEWORK, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+
   getTeacherClasses:(yearId:number):Promise<IResponse<any>>=>{
     return mainAxios.get(`${URL.GET_CLASS_TEACHER}?schoolYearId=${yearId}`)
-  }
+  } 
   ,
+
   updateAtendence:():Promise<IResponse<any>> =>{
     return mainAxios.put(`${URL.CREATE_ATENDENCE}`)
   }

@@ -22,11 +22,11 @@ const Attendences = () => {
   const { idYear } = useContext(YearContext);
   const [classId, setClassId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [attendenceClass, setAttendenceClass] = useState('attendance-by-day');
   const [form] = Form.useForm();
   const [dayOff, setDayOff] = useState(dayjs());
   const [disPlaySubmit, setDisplaySubmit] = useState('block');
   const [disPlayUpdate, setDisplayUpdatet] = useState('none');
+  const [attendancesData, setAttendencesData] = useState<AttendenceData[]>([])
 
   useEffect(() => {
     fetchStudents(true);
@@ -52,7 +52,8 @@ const Attendences = () => {
   const fetchStudents = async (getStudents: boolean = false): Promise<void> => {
     form.resetFields(["note"]);
     try {
-      if (schoolYearClass !== null && classId !== null) {
+      if (schoolYearClass !== null && classId !== null && classId !== undefined) {
+
         if (getStudents) {
           const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
           if (studentRes.status === 200) {
@@ -60,6 +61,7 @@ const Attendences = () => {
             if (attendanceRes.status === 200) {
               const studentData = studentRes.data;
               const attendanceData = attendanceRes.data;
+              setAttendencesData(attendanceData);
               setStudent(studentData.map((sd: Student) => {
                 const std: Student = sd;
                 const att = attendanceData.find((att: AttendenceData) => att.studentInfo.studentYearInfoId === sd.id);
@@ -78,6 +80,10 @@ const Attendences = () => {
                 return std;
               }));
             }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
           }
         }
       }
@@ -93,8 +99,13 @@ const Attendences = () => {
     try {
       const res = await teacherApi.getSchoolYearClass(idYear);
       setSchoolYearClass(res?.data);
+<<<<<<< HEAD
       if (res.status === 200) {
       }
+=======
+      setClassId(schoolYearClass[0]?.id);
+
+>>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         setSchoolYearClass([]);
@@ -174,8 +185,6 @@ const Attendences = () => {
     );
   };
 
-
-
   const columnsAttendenceByDay: TableColumnsType<Student> = [
     {
       title: 'Stt',
@@ -254,6 +263,7 @@ const Attendences = () => {
       render: (_, item) => (
         console.log("gshdg", item.students.attendenceData?.note),
         <Form.Item name={['note', item.id]} key={item.id}>
+<<<<<<< HEAD
           <TextArea defaultValue={item.students.attendenceData?.note || ""}
           autoSize />
         </Form.Item>
@@ -312,7 +322,15 @@ const Attendences = () => {
       key: 'Nghi_Khong_Phep',
       align: 'center',
     },
+=======
+          <TextArea defaultValue={item.students.attendenceData?.note} autoSize />
+        </Form.Item>
+      )
+    }
+>>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
   ];
+
+
 
   const handleSubmit = async () => {
     try {
@@ -386,7 +404,29 @@ const Attendences = () => {
   }).length
 
   return (
+      <Form form={form}>
+        <div>
+          <div style={{ display: 'flex', padding: '16px' }}>
+            <Form.Item className="classId" style={{ marginRight: '14px' }}>
+              <Select placeholder="Chọn lớp học"
+                value={classId} style={{ width: 150 }} onChange={handleChange}>
+                {schoolYearClass.map((classData) => (
+                  <Option key={classData.id} value={classData.id}>
+                    {classData.className}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item className="dayOff" name="dayOff" initialValue={dayOff}> {/* Thêm name cho Form.Item */}
+              <DatePicker
+                defaultValue={dayOff}
+                className="h-10 w-30" onChange={handleChangeDay}
+                format={'M/D/YYYY'}
+                maxDate={dayjs()}
+              />
+            </Form.Item>
 
+<<<<<<< HEAD
     <div className="attendances">
       <div className="attendanceItem">
         <div
@@ -424,6 +464,8 @@ const Attendences = () => {
               />
             </Form.Item>
 
+=======
+>>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
             <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
               Tất cả: {student.length}
             </div>
@@ -449,18 +491,27 @@ const Attendences = () => {
               />
             </div>
           )}
+<<<<<<< HEAD
           <div className="submit" style={{ display: `${disPlaySubmit}` }}>
+=======
+          <div className="submit" style={{ display: `${attendancesData.length>0?disPlayUpdate:disPlaySubmit}` }}>
+>>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
             <Button type="primary" className="btn-submit" onClick={handleSubmit}>
               Lưu Lại
             </Button>
           </div>
+<<<<<<< HEAD
           <div className="submit" style={{ display: `${disPlayUpdate}` }}>
+=======
+          <div className="submit" style={{ display: `${attendancesData.length>0?disPlaySubmit:disPlayUpdate}` }}>
+>>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
             <Button type="primary" className="btn-submit" onClick={submitUpdateAtendence}>
               Sửa Đổi
             </Button>
           </div>
         </div>
       </Form>
+<<<<<<< HEAD
       <div className={`${attendenceClass !== 'attendance-by-month' ? 'hiddens' : 'attendance-by-month'}`}>
         <div style={{ display: 'flex', padding: '16px' }}>
           <div style={{ marginRight: '14px' }}>
@@ -497,6 +548,8 @@ const Attendences = () => {
         </div>
       </div>
     </div>
+=======
+>>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
   );
 };
 

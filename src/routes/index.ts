@@ -105,7 +105,7 @@ export const coreRoutes: RouteConfig[] = [
     roles: ['ROLE_BGH'],
   },
   {
-    path: '/create-schedule',
+    path: '/create-schedule/:calendarReleaseId',
     component: CreateSchedule,
     title: 'Create Schedule',
     roles: ['ROLE_BGH'],
@@ -151,6 +151,18 @@ export const coreRoutes: RouteConfig[] = [
     component: FeeSign,
     title: 'Fee',
     roles: ['ROLE_BGH'],
+  },
+  {
+    path: '/homework',
+    component: HwList,
+    title: 'Homework',
+    roles: ['ROLE_BGH', 'ROLE_GV'],
+  },
+  {
+    path: '/homework-details/:HomeworkId',
+    component: HwDetails,
+    title: 'Homework Details',
+    roles: ['ROLE_BGH', 'ROLE_GV'],
   },
   {
     path: '/profile',

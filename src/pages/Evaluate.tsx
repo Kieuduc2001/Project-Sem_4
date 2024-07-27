@@ -56,13 +56,8 @@ const Evaluate = () => {
       const res = await teacherApi.getSchoolYearClassEntrusted(idYear, semester);
       const classSchoolYearSubject = res.data;
       let SchoolYearSubjectData = classSchoolYearSubject.filter((clss: SchoolYearClassAndSubEntrusted) => clss.schoolYearSubject.id === subjectIdGrade);
-      SchoolYearSubjectData.forEach((cls: SchoolYearClassAndSubEntrusted) => {
         setSchoolYearClass(cls.classList)
       })
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        setSchoolYearClass([]);
-        setStudent([]);
       } else if (error instanceof Error) {
         console.error('Failed to fetch school year classes:', error.message);
       } else {
@@ -91,6 +86,7 @@ const Evaluate = () => {
           }
         }
       }
+      console.log(student)
     }
 
     catch (error) {
@@ -109,6 +105,12 @@ const Evaluate = () => {
   const handleClassChange = (value: number, option: any) => {
     setClassId(value);
     setIdGrade(option.IdGrade);
+    fetchStudents(true);
+  };
+  const handleSemmerChange = (value: string) => {
+    setSemester(value);
+    fetchStudents(true)
+
   };
   const handleSemmerChange = (value: string) => {
     setSemester(value);
@@ -163,7 +165,6 @@ const Evaluate = () => {
       )
     },
     {
-      title: 'Điểm Trung Bình ',
       dataIndex: 'students',
       key: 'Diem',
       width: '14%',
@@ -201,10 +202,10 @@ const Evaluate = () => {
       render: (_, item) => (
         <>{item.students.evaluate?.studentScores.DTB}</>
       )
-    }
-  ];
-  return (
-    <div className="evaluate ">
+=======
+      )
+    },
+    {
               <div>
           <div style={{ display: 'flex', padding: '16px' }}>
             <div style={{ marginRight: '14px', display: "flex" }}>

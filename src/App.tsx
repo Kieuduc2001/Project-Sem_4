@@ -6,6 +6,7 @@ import routes, { coreRoutes } from './routes';
 import { getCookie } from './utils/storage/cookie-storage';
 import { Storage } from './contstants/storage';
 import { getLocalStorageItem } from './utils/storage/local-storage';
+import { getMessagingDeviceToken, onMessageListener } from './firebase';
 
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
 const NotFound = lazy(() => import('./pages/404page'));
@@ -22,6 +23,23 @@ function App() {
       navigate('/sign-in')
     }
   }, [token, navigate])
+
+  useEffect(() => {
+    getMessagingDeviceToken();
+
+  }, [])
+
+  useEffect(() => {
+    onMessageListener().then(data => {
+      console.log("Receive foreground: ", data)
+    })
+  })
+
+  const s = () => {
+
+
+  }
+
 
   const userData = JSON.parse(getLocalStorageItem(Storage.user) || '{}')
   const userRoles = userData.roles ? userData.roles.map((item: any) => item.name) : []
