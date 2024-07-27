@@ -23,6 +23,6 @@
       "@pages/*": ["pages/*"]
     },
   },
-  "include": ["src", "src/lib.d.ts"],
+  "include": ["src", "src/lib.d.ts", "public/firebase.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

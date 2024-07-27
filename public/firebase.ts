@@ -1,6 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/messaging";
-import { firebaseConfig } from './constants';
+import { firebaseConfig } from '../src/constants';
 
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);

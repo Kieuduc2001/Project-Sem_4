@@ -117,7 +117,7 @@ export const coreRoutes: RouteConfig[] = [
     roles: ['ROLE_BGH'],
   },
   {
-    path: '/edit-schedule/:calendarReleaseId/:scheduleId',
+    path: '/edit-schedule/:calendarReleaseId',
     component: EditSchedule,
     title: 'Edit Schedule',
     roles: ['ROLE_BGH'],

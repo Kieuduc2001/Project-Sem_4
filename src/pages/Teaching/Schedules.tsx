@@ -191,7 +191,7 @@ const Timetable: React.FC = () => {
 
   const handleEditClick = () => {
     if (selectedCalendarReleaseId) {
-      navigate(`/create-schedule/${selectedCalendarReleaseId}`);
+      navigate(`/edit-schedule/${selectedCalendarReleaseId}`);
     }
   };
 

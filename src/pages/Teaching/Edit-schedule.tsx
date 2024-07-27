@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import { Table, Button, Row, Col, Select, message, Typography, Form } from 'antd';
 import './Timetable.css';
 import mainAxios from '../../apis/main-axios';
@@ -50,10 +50,10 @@ const EditSchedule: React.FC = () => {
 
     useEffect(() => {
         const fetchScheduleData = async () => {
-            if (!scheduleId) return;
+            if (!calendarReleaseId) return;
             setIsLoading(true);
             try {
-                const res = await mainAxios.get(`/api/v1/schedule/${scheduleId}`);
+                const res = await mainAxios.get(`/api/v1/schedule/${calendarReleaseId}`);
                 const schedule = res.data;
                 setClassSchedules({ [schedule.classId]: schedule.scheduleDetails });
                 setClassId(schedule.classId);
@@ -286,7 +286,13 @@ const EditSchedule: React.FC = () => {
                             </Select>
                         </Col>
                         <Col>
-                            <Button type="primary" onClick={handleSubmit}>Update Schedule</Button>
+                            <NavLink
+                                to="/schedule"
+                                className="border bg-whiter text-center text-black px-4 rounded-md mr-3 pt-0.5"
+                            >
+                                Quay lại
+                            </NavLink>
+                            <Button type="primary" onClick={handleSubmit}>Chỉnh sửa</Button>
                         </Col>
                     </Row>
                     <h2 className="mb-3 text-lg">Morning</h2>
