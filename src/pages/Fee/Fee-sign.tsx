@@ -1,13 +1,98 @@
-import { useState } from 'react';
-import { Button, Modal, Form, Input, DatePicker, Select, Table, Checkbox, Row, Col, Menu, Dropdown } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import { useContext, useEffect, useState } from 'react';
+import {
+    Button,
+    Form,
+    Table,
+    Modal,
+    Input,
+    Layout,
+    Menu,
+    Select,
+    DatePicker
+} from 'antd';
+import Loader from '../../common/Loader';
+import { FeeList, FeePeriodResponse, SchoolYearClassData } from 'types/response';
+import teacherApi from '../../apis/urlApi';
+import { YearContext } from '../../context/YearProvider/YearProvider';
+import axios from 'axios';
 
-const { Option } = Select;
+const { Sider, Content } = Layout;
 
 const App = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [form] = Form.useForm();
+    const [isLoading, setIsLoading] = useState(false);
+    const { idYear } = useContext(YearContext);
+    const [feePeriod, setFeePeriod] = useState<FeePeriodResponse[]>([]);
+    const [fee, setFee] = useState<FeeList[]>([]);
+    const [classes, setClasses] = useState<SchoolYearClassData[]>([]);
+    const [selectedFeePeriod, setSelectedFeePeriod] = useState<FeePeriodResponse | null>(null);
+    const [selectedKey, setSelectedKey] = useState<string>('0');
+    const [selectedFees, setSelectedFees] = useState<number[]>([]); // New state for selected fees
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (idYear === null) return;
+            setIsLoading(true);
+            try {
+                const res = await teacherApi.getFeePeriod(idYear);
+                const periods = res.data || [];
+                setFeePeriod(periods);
+
+                // Automatically select the first period if it exists
+                if (periods.length > 0) {
+                    setSelectedFeePeriod(periods[0]);
+                    setSelectedKey(`${periods[0].id}`);
+                } else {
+                    setSelectedFeePeriod(null);
+                    setSelectedKey('0');
+                }
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response?.status === 404) {
+                    setFeePeriod([]);
+                } else if (error instanceof Error) {
+                    console.error('Failed to fetch fee period:', error.message);
+                } else {
+                    console.error('An unknown error occurred.');
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [idYear]);
+
+    useEffect(() => {
+        const fetchFee = async () => {
+            if (idYear === null) return;
+            setIsLoading(true);
+            try {
+                const res = await teacherApi.getFeeList(idYear);
+                setFee(res?.data || []);
+            } catch (error) {
+                console.error('Failed to fetch fee list:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchFee();
+    }, [idYear]);
+
+    useEffect(() => {
+        const fetchClass = async () => {
+            if (idYear === null) return;
+            setIsLoading(true);
+            try {
+                const res = await teacherApi.getSchoolYearClass(idYear);
+                setClasses(res?.data || []);
+            } catch (error) {
+                console.error('Failed to fetch classes:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchClass();
+    }, [idYear]);
 
     const showModal = () => {
         setIsModalVisible(true);
@@ -17,30 +102,65 @@ const App = () => {
         setIsModalVisible(false);
     };
 
-    const handleSubmit = () => {
-        form.validateFields().then(values => {
-            console.log('Form values:', values);
+    const handleSubmit = async () => {
+        try {
+            const formData = await form.validateFields();
+
+            if (idYear === null) {
+                console.error('schoolYearId is null');
+                return;
+            }
+
+            const postData = {
+                title: formData.title,
+                content: formData.content,
+                schoolYearId: idYear,
+                endDate: formData.endDate.format('YYYY-MM-DD'),
+                feePeriodScope: {
+                    objectIdList: formData.objectIdList || [],
+                    scopeId: formData.scopeId || 2,
+                },
+                schoolYearFeePeriodCreateList: fee
+                    .filter(item => selectedFees.includes(item.id)) // Filter selected fees
+                    .map(item => ({
+                        amount: Number(formData[`amount_${item.id}`]),
+                        schoolYearFeeId: item.id,
+                    })),
+            };
+
+            console.log('Post data:', postData);
+            await teacherApi.postFeePeriod(postData);
             setIsModalVisible(false);
-        }).catch(errorInfo => {
-            console.error('Failed to submit form:', errorInfo);
-        });
+
+            // // Refresh data after submission
+            // const res = await teacherApi.getFeePeriod(idYear);
+            // setFeePeriod(res.data || []);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const handleMenuClick = (feePeriodId: number) => {
+        const selectedPeriod = feePeriod.find(period => period.id === feePeriodId);
+        setSelectedFeePeriod(selectedPeriod || null);
+        setSelectedKey(`${feePeriodId}`);
     };
 
     const columns = [
         {
-            title: 'Nhóm lớp',
-            dataIndex: '',
-            key: '',
+            title: "Nhóm lớp",
+            dataIndex: 'className',
+            key: 'className',
         },
         {
             title: 'Số thu',
-            dataIndex: '',
-            key: '',
+            dataIndex: 'totalStudent',
+            key: 'totalStudent',
         },
         {
             title: 'Số đã thu',
-            dataIndex: '',
-            key: '',
+            dataIndex: 'totalPaid',
+            key: 'totalPaid',
         },
         {
             title: 'Số còn phải thu',
@@ -48,165 +168,155 @@ const App = () => {
             key: '',
         },
         {
-            title: 'Thông báo',
-            dataIndex: '',
-            key: '',
+            title: 'Nội dung',
+            dataIndex: 'content',
+            key: 'content',
+            render: (content: string | null) => content || '-',
         },
     ];
 
+    const dataSource = selectedFeePeriod ? selectedFeePeriod.classList.map(classItem => ({
+        key: `${selectedFeePeriod.id}-${classItem.schoolYearClass.id}`,
+        className: classItem.schoolYearClass.className,
+        totalStudent: classItem.totalStudent,
+        totalPaid: classItem.totalPaid,
+        amountDue: classItem.totalStudent - classItem.totalPaid,
+        content: selectedFeePeriod.content || '-',
+    })) : [];
+
     return (
-        <div style={{ padding: '20px' }}>
-            <Row gutter={16}>
-                <Col span={6} className='h-screen border-gray-4 rounded-md bg-gray-3 pt-4'>
-                    <div>
-                        <h3>Đợt đăng ký</h3>
-                        <Select defaultValue="3" style={{ width: '100%', marginBottom: '10px' }}>
-                            <Option value="3">Đợt đăng ký tháng 3</Option>
-                            <Option value="4">Đợt đăng ký tháng 4</Option>
-                        </Select>
-                    </div>
-                    <div>
-                        <h3>Phạm vi <span className='text-meta-7 text-base'>*</span></h3>
-                        <Select defaultValue="toanTruong" style={{ width: '100%', marginBottom: '10px' }}>
-                            <Option value="toanTruong">Toàn trường</Option>
-                            <Option value="lop1">Lớp 1</Option>
-                            <Option value="lop2">Lớp 2</Option>
-                        </Select>
-                    </div>
-                    <div>
-                        <h3>Khoản thu</h3>
-                        <Checkbox>Sửa học đường</Checkbox><br />
-                        <Checkbox>Chăm sóc bán trú</Checkbox><br />
-                        <Checkbox>Đồng phục mùa đông</Checkbox>
-                    </div>
-                </Col>
-                <Col span={18}>
-                    <Row className='mb-4'>
-                        <Col span={12} className='pt-'>
-                            <p>Khoản đăng ký tháng ...</p>
-                        </Col>
-                        <Col span={12} className='flex'>
-                            <Button className='' type="primary" onClick={showModal} style={{ marginRight: '10px' }}>
-                                Lập đợt mới
+        <div>
+            {isLoading ? (
+                <Loader />
+            ) : (
+                <Layout className="h-screen">
+                    <Sider width={200} className="site-layout-background h-full bg-white">
+                        <div className="min-h-20 bg-white flex items-center justify-center flex-col">
+                            <Button type="default" onClick={showModal} className="w-40">
+                                Tạo đợt thu mới
                             </Button>
-                            <Button>
-                                Xác nhận
-                            </Button>
-                        </Col>
-                    </Row>
-                    <Table columns={columns} pagination={false} bordered />
-                </Col>
-            </Row>
-            <Modal
-                title="Lập đợt đăng ký khoản thu"
-                visible={isModalVisible}
-                onCancel={handleCancel}
-                footer={[
-                    <Button key="back" onClick={handleCancel}>
-                        Đóng
-                    </Button>,
-                    <Button key="submit" type="primary" onClick={handleSubmit}>
-                        Lập đợt đăng ký
-                    </Button>,
-                ]}
-            >
-                <Form
-                    form={form}
-                    layout="vertical"
-                    initialValues={{
-                        registrationDate: moment(),
-                    }}
-                >
-                    <Form.Item
-                        name="registrationDate"
-                        label="Hạn đăng ký"
-                        rules={[{ required: true, message: 'Vui lòng chọn hạn đăng ký!' }]}
-                    >
-                        <DatePicker className="w-full" format="DD/MM/YYYY" />
-                    </Form.Item>
-                    <Form.Item
-                        name="releaseName"
-                        label="Tên đợt đăng ký"
-                        rules={[{ required: true, message: 'Vui lòng nhập tên đợt đăng ký!' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        name="scope"
-                        label="Phạm vi"
-                        rules={[{ required: true, message: 'Vui lòng chọn phạm vi!' }]}
-                    >
-                        <Select placeholder="Chọn phạm vi">
-                            <Option value="toanTruong">Toàn trường</Option>
-                            <Option value="lop1">Lớp 1</Option>
-                            <Option value="lop2">Lớp 2</Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item
-                        name="fees"
-                        label="Danh sách các khoản thu"
-                        rules={[{ required: true, message: 'Vui lòng chọn các khoản thu!' }]}
-                    >
-                        <Table
-                            columns={[
-                                {
-                                    title: '',
-                                    dataIndex: 'fee',
-                                    key: 'fee',
-                                },
-                                {
-                                    title: 'Nhóm khoản thu',
-                                    dataIndex: 'feeGroup',
-                                    key: 'feeGroup',
-                                },
-                                {
-                                    title: 'Đơn giá',
-                                    dataIndex: 'price',
-                                    key: 'price',
-                                },
-                                {
-                                    title: 'Đơn vị',
-                                    dataIndex: 'unit',
-                                    key: 'unit',
-                                },
-                            ]}
-                            dataSource={[
-                                {
-                                    key: '1',
-                                    fee: <Checkbox>Sửa học đường</Checkbox>,
-                                    feeGroup: 'Đường học',
-                                    price: '2,954',
-                                    unit: 'Ngày',
-                                },
-                                {
-                                    key: '2',
-                                    fee: <Checkbox>Chăm sóc bán trú</Checkbox>,
-                                    feeGroup: 'Bán trú',
-                                    price: '15,000',
-                                    unit: 'Ngày',
-                                },
-                                {
-                                    key: '3',
-                                    fee: <Checkbox>Đồng phục mùa đông</Checkbox>,
-                                    feeGroup: 'Đồng phục',
-                                    price: '150,000',
-                                    unit: 'Năm',
-                                },
-                            ]}
-                            pagination={false}
-                            rowKey="key"
-                            bordered
-                        />
-                    </Form.Item>
-                    <Form.Item
-                        name="note"
-                        label="Ghi chú"
-                    >
-                        <Input.TextArea rows={2} />
-                    </Form.Item>
-                </Form>
-                <p>Chú ý: Khi lập đợt đăng ký sẽ đồng thời gửi thông báo đến phụ huynh.</p>
-            </Modal>
+                        </div>
+                        <Menu
+                            mode="inline"
+                            selectedKeys={[selectedKey]}
+                            style={{ height: '100%', borderRight: 0 }}
+                            onClick={({ key }) => handleMenuClick(Number(key))}
+                        >
+                            {feePeriod.map((period) => (
+                                <Menu.Item key={period.id}>{period.title}</Menu.Item>
+                            ))}
+                        </Menu>
+                    </Sider>
+                    <Layout style={{ padding: '0 24px 24px' }}>
+                        <Content
+                            className="site-layout-background p-4 md:p-6 2xl:p-10"
+                            style={{
+                                padding: 24,
+                                margin: 0,
+                                minHeight: 280,
+                            }}
+                        >
+                            <Modal
+                                title="Tạo đợt thu"
+                                visible={isModalVisible}
+                                onCancel={handleCancel}
+                                footer={[
+                                    <Button key="back" onClick={handleCancel}>
+                                        Huỷ
+                                    </Button>,
+                                    <Button key="submit" type="primary" onClick={handleSubmit}>
+                                        Xác nhận
+                                    </Button>,
+                                ]}
+                            >
+                                <Form
+                                    form={form}
+                                    name="addFeeForm"
+                                    labelCol={{ flex: '110px' }}
+                                    labelAlign="left"
+                                    labelWrap
+                                    wrapperCol={{ flex: 1 }}
+                                    colon={false}
+                                >
+                                    <Form.Item
+                                        label="Tên đợt thu"
+                                        name="title"
+                                        rules={[{ required: true, message: 'Please input the title!' }]}
+                                        className='mt-5'
+                                    >
+                                        <Input />
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label="Ngày hết hạn"
+                                        name="endDate"
+                                        rules={[{ required: true, message: 'Please select the end date!' }]}
+                                    >
+                                        <DatePicker className='w-full' />
+                                    </Form.Item>
+                                    <Form.Item
+                                        label="Phạm vi"
+                                        name="objectIdList"
+                                        rules={[{ required: true, message: 'Please select the classes!' }]}
+                                    >
+                                        <Select mode="multiple">
+                                            {classes.map((classItem) => (
+                                                <Select.Option key={classItem.id} value={classItem.id}>
+                                                    {classItem.className}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label="Mô tả"
+                                        name="content"
+                                    >
+                                        <Input />
+                                    </Form.Item>
+                                    <Table
+                                        dataSource={fee}
+                                        pagination={false}
+                                        scroll={{ y: 240 }}
+                                        className='mb-4'
+                                        rowSelection={{
+                                            type: 'checkbox',
+                                            onChange: (selectedRowKeys) => {
+                                                setSelectedFees(selectedRowKeys as number[]);
+                                            },
+                                        }}
+                                        rowKey="id"
+                                    >
+                                        <Table.Column title="Khoản thu" dataIndex="title" />
+                                        <Table.Column
+                                            title="Số lượng"
+                                            dataIndex="amount"
+                                            render={(text, record: FeeList) => (
+                                                <Form.Item
+                                                    name={`amount_${record.id}`}
+                                                >
+                                                    <Input type="number" />
+                                                </Form.Item>
+                                            )}
+                                        />
+                                        <Table.Column
+                                            title="Đơn vị"
+                                            dataIndex="feePrices"
+                                            render={(feePrices) => feePrices[0]?.unit?.name || ''}
+                                        />
+                                    </Table>
+                                </Form>
+                            </Modal>
+
+                            <Table
+                                dataSource={dataSource}
+                                columns={columns}
+                                rowKey="key"
+                            />
+                        </Content>
+                    </Layout>
+                </Layout>
+            )}
         </div>
     );
 };

@@ -1,12 +1,11 @@
+
 import { useContext, useEffect, useState } from 'react';
 import { Result, Table } from 'antd';
 import type { TableColumnsType } from 'antd';
 import { Select } from 'antd';
 import type {
   EvaluateData,
-  SchoolYearClassAndSubEntrusted,
   SchoolYearClassData,
-  SchoolYearClassEntrusted,
   Student,
   SubjectProgram,
 } from '../types/response';
@@ -15,7 +14,6 @@ import teacherApi from '../apis/urlApi';
 import axios from 'axios';
 import mainAxios from '../apis/main-axios';
 import { NavLink } from 'react-router-dom';
-import Students from './Students/Student-list';
 
 const { Option } = Select;
 const optionSemmer = [

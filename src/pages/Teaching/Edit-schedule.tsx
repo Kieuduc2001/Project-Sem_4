@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import { Table, Button, Row, Col, Select, message, Typography, Form } from 'antd';
 import './Timetable.css';
-import teacherApi from '../../apis/urlApi';
-import { SchoolYearClassData, SubjectForSchedule } from '../../types/response';
+import mainAxios from '../../apis/main-axios';
 import Loader from '../../common/Loader';
 import { YearContext } from '../../context/YearProvider/YearProvider';
-import mainAxios from '../../apis/main-axios';
 
 const { Option } = Select;
 const { Paragraph } = Typography;
@@ -23,44 +21,55 @@ interface Schedule {
     };
 }
 
-interface Params extends Record<string, string | undefined> {
-    calendarReleaseId: string;
+interface SubjectForSchedule {
+    id: number;
+    subject: {
+        id: number;
+        name: string;
+    };
+    teacher: {
+        id: number;
+        name: string;
+    };
 }
 
-const Timetable: React.FC = () => {
-    const { calendarReleaseId } = useParams<Params>();
-    const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
+interface Params extends Record<string, string | undefined> {
+    calendarReleaseId: string;
+    scheduleId: string;
+}
+
+const EditSchedule: React.FC = () => {
+    const { calendarReleaseId, scheduleId } = useParams<Params>();
     const [subjectTeacher, setSubjectTeacher] = useState<SubjectForSchedule[]>([]);
     const { idYear } = useContext(YearContext);
-    const [classId, setClassId] = useState<number | null>(1);
+    const [classId, setClassId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [classSchedules, setClassSchedules] = useState<{ [classId: string]: Schedule }>({});
+    const [schoolYearClass, setSchoolYearClass] = useState<any[]>([]);
     const [form] = Form.useForm();
 
     useEffect(() => {
-        const fetchSchoolYearClassData = async () => {
-            if (idYear === null) return;
+        const fetchScheduleData = async () => {
+            if (!calendarReleaseId) return;
             setIsLoading(true);
             try {
-                const res = await teacherApi.getSchoolYearClass(idYear);
-                setSchoolYearClass(res?.data);
+                const res = await mainAxios.get(`/api/v1/schedule/${calendarReleaseId}`);
+                const schedule = res.data;
+                setClassSchedules({ [schedule.classId]: schedule.scheduleDetails });
+                setClassId(schedule.classId);
             } catch (error) {
-                console.error('Failed to fetch school year class data:', error);
-                message.error('Failed to fetch school year class data.');
+                console.error('Failed to fetch schedule data:', error);
+                message.error('Failed to fetch schedule data.');
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchSchoolYearClassData();
-    }, [idYear]);
 
-    useEffect(() => {
         const fetchSubjectTeacherData = async () => {
             if (classId === null) return;
             setIsLoading(true);
             try {
                 const res = await mainAxios.get(`/api/v1/schedule/get-teacher-class-subject?classId=${classId}`);
-                console.log(res);
                 setSubjectTeacher(res?.data || []);
             } catch (error) {
                 console.error('Failed to fetch subject data:', error);
@@ -69,19 +78,20 @@ const Timetable: React.FC = () => {
                 setIsLoading(false);
             }
         };
-        fetchSubjectTeacherData();
-    }, [classId]);
 
-    const handleClassChange = (value: number) => {
-        setClassId(value);
-        // Initialize schedule for the selected class if not already initialized
-        if (!classSchedules[value]) {
-            setClassSchedules(prev => ({
-                ...prev,
-                [value]: {},
-            }));
-        }
-    };
+        const fetchSchoolYearClasses = async () => {
+            try {
+                const res = await mainAxios.get(`/api/v1/school-year-class?schoolYearId=${idYear}`);
+                setSchoolYearClass(res.data);
+            } catch (error) {
+                console.error('Failed to fetch school year classes:', error);
+            }
+        };
+
+        fetchScheduleData();
+        fetchSubjectTeacherData();
+        fetchSchoolYearClasses();
+    }, [classId, scheduleId, idYear]);
 
     const handleSelectChange = (
         value: string,
@@ -114,13 +124,19 @@ const Timetable: React.FC = () => {
         }));
     };
 
-    const renderSelect: (classId: number, day: Day, lesson: number, shift: Shift, type: Type) => JSX.Element | null = (classId, day, lesson, shift, type) => {
+    const renderSelect = (
+        classId: number,
+        day: Day,
+        lesson: number,
+        shift: Shift,
+        type: Type
+    ): JSX.Element | null => {
         const shiftOffset = shift === 'morning' ? 0 : 4;
         const key = `${day}-${lesson + shiftOffset}`;
         let options: { id: number; name: string }[] = [];
 
         if (type === 'subject') {
-            options = subjectTeacher.map((subject) => ({
+            options = subjectTeacher.map(subject => ({
                 id: subject.subject.id,
                 name: subject.subject.name,
             }));
@@ -131,16 +147,15 @@ const Timetable: React.FC = () => {
                 <Select
                     style={{ width: 120 }}
                     value={classSchedules[classId]?.[key]?.[type]}
-                    onChange={(value) => handleSelectChange(value, day, lesson, shift, type)}
+                    onChange={value => handleSelectChange(value, day, lesson, shift, type)}
                 >
-                    {options.map((option) => (
+                    {options.map(option => (
                         <Option key={option.id} value={option.name}>
                             {option.name}
                         </Option>
                     ))}
                 </Select>
             );
-
         } else if (type === 'teacher') {
             const selectedSubjectName = classSchedules[classId]?.[key]?.subject;
             const selectedSubject = subjectTeacher.find(subject => subject.subject.name === selectedSubjectName);
@@ -152,7 +167,7 @@ const Timetable: React.FC = () => {
             );
         }
 
-        return null; // Fallback return for unexpected cases
+        return null;
     };
 
     const transformScheduleData = (shift: Shift): any[] => {
@@ -160,7 +175,7 @@ const Timetable: React.FC = () => {
         const days: Day[] = ['T2', 'T3', 'T4', 'T5', 'T6'];
 
         for (let i = 1; i <= 4; i++) {
-            const rowSubject: any = { indexLesson: `<b>Tiết ${i}</b> - Môn học` };
+            const rowSubject: any = { indexLesson: `<b>Lesson ${i}</b> - Subject` };
             days.forEach(day => {
                 rowSubject[day.toLowerCase()] = renderSelect(classId ?? 0, day, i, shift, 'subject');
             });
@@ -172,7 +187,7 @@ const Timetable: React.FC = () => {
 
     const columns = [
         {
-            title: 'Thứ/Tiết',
+            title: 'Day/Lesson',
             dataIndex: 'indexLesson',
             key: 'indexLesson',
             width: 100,
@@ -180,31 +195,31 @@ const Timetable: React.FC = () => {
             render: (text: string) => <div dangerouslySetInnerHTML={{ __html: text }} />
         },
         {
-            title: 'Thứ 2',
+            title: 'Monday',
             dataIndex: 't2',
             key: 't2',
             align: 'center' as 'center',
         },
         {
-            title: 'Thứ 3',
+            title: 'Tuesday',
             dataIndex: 't3',
             key: 't3',
             align: 'center' as 'center',
         },
         {
-            title: 'Thứ 4',
+            title: 'Wednesday',
             dataIndex: 't4',
             key: 't4',
             align: 'center' as 'center',
         },
         {
-            title: 'Thứ 5',
+            title: 'Thursday',
             dataIndex: 't5',
             key: 't5',
             align: 'center' as 'center',
         },
         {
-            title: 'Thứ 6',
+            title: 'Friday',
             dataIndex: 't6',
             key: 't6',
             align: 'center' as 'center',
@@ -214,13 +229,12 @@ const Timetable: React.FC = () => {
     const morningData = transformScheduleData('morning');
     const afternoonData = transformScheduleData('afternoon');
 
-
     const handleSubmit = async () => {
         try {
             const scheduleDetails = Object.keys(classSchedules[String(classId)] || {}).map(key => {
                 const [day, lessonStr] = key.split('-');
                 const lesson = parseInt(lessonStr, 10);
-                const studyTime = lesson <= 4 ? 'SANG' : 'CHIEU';
+                const studyTime = lesson <= 4 ? 'MORNING' : 'AFTERNOON';
                 const { teacherSchoolYearClassSubjectId } = classSchedules[String(classId)][key];
 
                 return {
@@ -238,12 +252,16 @@ const Timetable: React.FC = () => {
                 scheduleDetailCreate: scheduleDetails,
             };
 
-            await mainAxios.post('/api/v1/schedule/create-schedule', postData);
-            message.success('Thời khóa biểu đã được tạo thành công');
+            await mainAxios.put(`/api/v1/schedule/update-schedule`, postData);
+            message.success('Schedule has been successfully updated');
         } catch (error) {
             console.error('Failed to submit form:', error);
-            message.error('Có lỗi xảy ra khi tạo thời khóa biểu');
+            message.error('Error occurred while updating the schedule');
         }
+    };
+
+    const handleClassChange = (value: number) => {
+        setClassId(value);
     };
 
     return (
@@ -258,9 +276,9 @@ const Timetable: React.FC = () => {
                                 style={{ width: 120 }}
                                 value={classId || undefined}
                                 onChange={handleClassChange}
-                                placeholder="Chọn lớp"
+                                placeholder="Select class"
                             >
-                                {schoolYearClass.map((schoolClass) => (
+                                {schoolYearClass.map(schoolClass => (
                                     <Option key={schoolClass.id} value={schoolClass.id}>
                                         {schoolClass.className}
                                     </Option>
@@ -268,10 +286,16 @@ const Timetable: React.FC = () => {
                             </Select>
                         </Col>
                         <Col>
-                            <Button type="primary" onClick={handleSubmit}>Tạo thời khóa biểu</Button>
+                            <NavLink
+                                to="/schedule"
+                                className="border bg-whiter text-center text-black px-4 rounded-md mr-3 pt-0.5"
+                            >
+                                Quay lại
+                            </NavLink>
+                            <Button type="primary" onClick={handleSubmit}>Chỉnh sửa</Button>
                         </Col>
                     </Row>
-                    <h2 className='mb-3 text-lg'>Buổi sáng</h2>
+                    <h2 className="mb-3 text-lg">Morning</h2>
                     <Table
                         columns={columns}
                         dataSource={morningData}
@@ -279,7 +303,7 @@ const Timetable: React.FC = () => {
                         bordered
                         rowClassName={(_, index) => (index % 2 === 0 ? 'even-row' : 'odd-row')}
                     />
-                    <h2 className='mb-3 mt-3 text-lg'>Buổi chiều</h2>
+                    <h2 className="mb-3 mt-3 text-lg">Afternoon</h2>
                     <Table
                         columns={columns}
                         dataSource={afternoonData}
@@ -293,4 +317,4 @@ const Timetable: React.FC = () => {
     );
 };
 
-export default Timetable;
+export default EditSchedule;

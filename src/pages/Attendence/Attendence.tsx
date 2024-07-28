@@ -254,7 +254,7 @@ const Attendences = () => {
       render: (_, item) => (
         console.log("gshdg", item.students.attendenceData?.note),
         <Form.Item name={['note', item.id]} key={item.id}>
-          <TextArea defaultValue={item.students.attendenceData?.note} autoSize />
+          <TextArea defaultValue={item.students.attendenceData?.note ? item.students.attendenceData.note : ""} autoSize />
         </Form.Item>
       )
     }
@@ -395,5 +395,3 @@ const Attendences = () => {
 };
 
 export default Attendences;
-
-
