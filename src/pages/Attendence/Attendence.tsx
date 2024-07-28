@@ -53,7 +53,6 @@ const Attendences = () => {
     form.resetFields(["note"]);
     try {
       if (schoolYearClass !== null && classId !== null && classId !== undefined) {
-
         if (getStudents) {
           const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
           if (studentRes.status === 200) {
@@ -80,10 +79,6 @@ const Attendences = () => {
                 return std;
               }));
             }
-<<<<<<< HEAD
-=======
-
->>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
           }
         }
       }
@@ -99,13 +94,8 @@ const Attendences = () => {
     try {
       const res = await teacherApi.getSchoolYearClass(idYear);
       setSchoolYearClass(res?.data);
-<<<<<<< HEAD
-      if (res.status === 200) {
-      }
-=======
       setClassId(schoolYearClass[0]?.id);
 
->>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         setSchoolYearClass([]);
@@ -185,6 +175,8 @@ const Attendences = () => {
     );
   };
 
+
+
   const columnsAttendenceByDay: TableColumnsType<Student> = [
     {
       title: 'Stt',
@@ -226,7 +218,6 @@ const Attendences = () => {
           onChange={() => handleCheckboxChange(record.id, 'CO_MAT')}
         />
       ),
-
     },
     {
       title: 'Nghỉ có phép',
@@ -263,78 +254,15 @@ const Attendences = () => {
       render: (_, item) => (
         console.log("gshdg", item.students.attendenceData?.note),
         <Form.Item name={['note', item.id]} key={item.id}>
-<<<<<<< HEAD
-          <TextArea defaultValue={item.students.attendenceData?.note || ""}
-          autoSize />
-        </Form.Item>
-      ),
-    }
-  ];
-
-  const columnsAttendenceByMonth: TableColumnsType<Student> = [
-    {
-      title: 'Stt',
-      dataIndex: 'Stt',
-      key: 'Stt',
-      width: '5%',
-      align: 'center',
-      render: (_, __, index) => index + 1,
-    },
-    {
-      title: 'Họ tên',
-      dataIndex: 'students',
-      key: 'Ho_Ten',
-      width: '25%',
-      align: 'center',
-      render: (item) => (
-        <>{item.firstName} {item.lastName}</>
-      )
-    },
-    {
-      title: 'Ngày sinh',
-      dataIndex: 'students',
-      key: 'Ngay_sinh',
-      width: '14%',
-      align: 'center',
-      render: (item) => (
-        <>{formatDate(item.birthday)}</>
-      )
-    }
-    ,
-    {
-      title: 'Tổng Ngày Nghỉ',
-      dataIndex: 'Tong_Ngay_nghi',
-      width: '10%',
-      key: 'Tong_Ngay_nghi',
-      align: 'center',
-    },
-    {
-      title: 'Nghỉ Có Phép',
-      dataIndex: 'Nghi_Co_Phep',
-      width: '10%',
-      key: 'Nghi_Co_Phep',
-      align: 'center',
-    },
-    {
-      title: 'Nghỉ không phép',
-      dataIndex: 'Nghi_Khong_Phep',
-      width: '10%',
-      key: 'Nghi_Khong_Phep',
-      align: 'center',
-    },
-=======
-          <TextArea defaultValue={item.students.attendenceData?.note} autoSize />
+          <TextArea defaultValue={item.students.attendenceData?.note ? item.students.attendenceData.note : ""} autoSize />
         </Form.Item>
       )
     }
->>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
   ];
-
 
 
   const handleSubmit = async () => {
     try {
-
       const values = form.getFieldsValue();
       const students: StudentRequestDto[] = student.map((student, index: number) => {
         const attendanceStatus = student.students.attendenceData?.attendanceStatus || 'CO_MAT';
@@ -426,46 +354,6 @@ const Attendences = () => {
               />
             </Form.Item>
 
-<<<<<<< HEAD
-    <div className="attendances">
-      <div className="attendanceItem">
-        <div
-          className={`attendance ${attendenceClass === 'attendance-by-day' ? 'actives' : ''}`}
-          onClick={() => setAttendenceClass('attendance-by-day')}
-        >
-          Điểm danh theo ngày
-        </div>
-        <div
-          className={`attendance ${attendenceClass === 'attendance-by-month' ? 'actives' : ''}`}
-          onClick={() => setAttendenceClass('attendance-by-month')}
-        >
-          Điểm danh theo tháng
-        </div>
-      </div>
-      <Form form={form}>
-        <div className={`${attendenceClass !== 'attendance-by-day' ? 'hiddens' : 'attendance-by-day'}`}>
-          <div style={{ display: 'flex', padding: '16px' }}>
-            <Form.Item className="classId" style={{ marginRight: '14px' }}>
-              <Select placeholder="Chọn lớp học"
-                value={schoolYearClass[0]?.id} style={{ width: 150 }} onChange={handleChange}>
-                {schoolYearClass.map((classData) => (
-                  <Option key={classData.id} value={classData.id}>
-                    {classData.className}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item className="dayOff" name="dayOff" initialValue={dayOff}> {/* Thêm name cho Form.Item */}
-              <DatePicker
-                defaultValue={dayOff}
-                className="h-10 w-30" onChange={handleChangeDay}
-                format={'M/D/YYYY'}
-                maxDate={dayjs()}
-              />
-            </Form.Item>
-
-=======
->>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
             <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
               Tất cả: {student.length}
             </div>
@@ -491,68 +379,19 @@ const Attendences = () => {
               />
             </div>
           )}
-<<<<<<< HEAD
-          <div className="submit" style={{ display: `${disPlaySubmit}` }}>
-=======
           <div className="submit" style={{ display: `${attendancesData.length>0?disPlayUpdate:disPlaySubmit}` }}>
->>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
             <Button type="primary" className="btn-submit" onClick={handleSubmit}>
               Lưu Lại
             </Button>
           </div>
-<<<<<<< HEAD
-          <div className="submit" style={{ display: `${disPlayUpdate}` }}>
-=======
           <div className="submit" style={{ display: `${attendancesData.length>0?disPlaySubmit:disPlayUpdate}` }}>
->>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
             <Button type="primary" className="btn-submit" onClick={submitUpdateAtendence}>
               Sửa Đổi
             </Button>
           </div>
         </div>
       </Form>
-<<<<<<< HEAD
-      <div className={`${attendenceClass !== 'attendance-by-month' ? 'hiddens' : 'attendance-by-month'}`}>
-        <div style={{ display: 'flex', padding: '16px' }}>
-          <div style={{ marginRight: '14px' }}>
-            <Select style={{ width: 150 }} onChange={handleChange} value={schoolYearClass[0]?.id}>
-              {schoolYearClass.map((classData) => (
-                <Option key={classData.id} value={classData.id}>
-                  {classData.className}
-                </Option>
-              ))}
-            </Select>
-          </div>
-          <Space direction="vertical">
-            <DatePicker disabledDate={(date) => date.isBefore(dayjs())} />
-          </Space>
-        </div>
-        <div className="list-student">
-          <Table
-            columns={columnsAttendenceByMonth}
-            dataSource={student}
-            pagination={false}
-            bordered
-            scroll={{ y: 385 }}
-          />
-        </div>
-        <div className="submit" style={{ display: `${disPlaySubmit}` }}>
-          <Button type="primary" className="btn-submit" onClick={handleSubmit} >
-            Lưu Lại
-          </Button>
-        </div>
-        <div className="submit" style={{ display: `${disPlayUpdate}` }}>
-          <Button type="primary" className="btn-submit" onClick={submitUpdateAtendence}>
-            Sửa Đổi
-          </Button>
-        </div>
-      </div>
-    </div>
-=======
->>>>>>> 5565cb14f5ff945f2e1cd5534140ba756067288b
   );
 };
 
 export default Attendences;
-
-
