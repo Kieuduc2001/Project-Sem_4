@@ -23,3 +23,21 @@ root.render(
     </Provider>
   </React.StrictMode>,
 );
+
+
+// if ('serviceWorker' in navigator) {
+//   window.addEventListener('load', () => {
+//     navigator.serviceWorker
+//       .register('/firebase-messaging-sw.js')
+//       .then((registration) => {
+//         console.log(
+//           'Service Worker registered with scope: ',
+//           registration.scope
+//         );
+//       })
+//       .catch((registrationError) => {
+//         console.log('Service Worker registration failed: ', registrationError);
+//       });
+//   });
+// }
+

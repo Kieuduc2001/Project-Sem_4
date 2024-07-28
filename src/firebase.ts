@@ -1,38 +1,48 @@
-import firebase from "firebase/app";
-import "firebase/messaging";
-import { firebaseConfig } from './constants';
+import { initializeApp } from 'firebase/app';
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  MessagePayload,
+} from 'firebase/messaging';
 
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-} else {
-    firebase.app(); // if already initialized, use that one
-}
-
-let messaging: firebase.messaging.Messaging;
-
-if (typeof window !== "undefined") {
-    if (firebase.messaging.isSupported()) {
-        messaging = firebase.messaging();
-    }
-}
-
-export const getMessagingDeviceToken = async () => {
-    let currentToken = "";
-    if (!messaging) return;
-    try {
-        currentToken = await messaging.getToken({
-            vapidKey: "BGu8h6ldSab2I6yJQXsUNNn-yvki3f_4ikbXtmW9PCUeDbERHmjCi4CSl9cGWbvUF7N1k2hVtLhMSTAKb0TEoSM",
-        });
-        console.log("FCM registration token", currentToken);
-    } catch (error) {
-        console.log("An error occurred while retrieving token. ", error);
-    }
-    return currentToken;
+const firebaseConfig = {
+  apiKey: 'AIzaSyBXX2dHPna8O-NbaWTD7ukqSTaPVA9rdy0',
+  authDomain: 'cloudmessages4-2875f.firebaseapp.com',
+  databaseURL:
+    'https://cloudmessages4-2875f-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'cloudmessages4-2875f',
+  storageBucket: 'cloudmessages4-2875f.appspot.com',
+  messagingSenderId: '1021060863316',
+  appId: '1:1021060863316:web:a147612fd4043fe02e24c1',
 };
 
-export const onMessageListener = () =>
-    new Promise((resolve) => {
-        messaging.onMessage((payload) => {
-            resolve(payload);
-        });
+const vapidKey =
+  'BGu8h6ldSab2I6yJQXsUNNn-yvki3f_4ikbXtmW9PCUeDbERHmjCi4CSl9cGWbvUF7N1k2hVtLhMSTAKb0TEoSM';
+
+const firebaseApp = initializeApp(firebaseConfig);
+const messaging = getMessaging(firebaseApp);
+
+export const getDeviceToken = async (): Promise<void> => {
+  try {
+    const currentToken = await getToken(messaging, { vapidKey });
+    if (currentToken) {
+      console.log('Current token for client:', currentToken);
+      // Send the token to your server and save it
+    } else {
+      console.log(
+        'No registration token available. Request permission to generate one.'
+      );
+      // Show permission UI
+    }
+  } catch (err) {
+    console.error('An error occurred while retrieving token. ', err);
+  }
+};
+
+export const onMessageListener = (): Promise<MessagePayload> =>
+  new Promise((resolve) => {
+    onMessage(messaging, (payload: any) => {
+      resolve(payload);
     });
+  });
