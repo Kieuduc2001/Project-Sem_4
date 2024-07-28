@@ -37,7 +37,7 @@ interface ErrRes {
     path: string;
     error: string;
 }
-export default function Teachers({ onAdd }: any) {
+export default function AppTeachers({ onAdd }: any) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [form] = Form.useForm();
     const [teachers, setTeachers] = useState<TeacherData[]>([]);
