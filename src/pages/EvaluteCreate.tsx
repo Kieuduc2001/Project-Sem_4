@@ -10,8 +10,6 @@ import teacherApi from '../apis/urlApi';
 import axios from 'axios';
 import mainAxios from '../apis/main-axios';
 import { Button, Form, Input, Result, Select, Table, TableColumnsType, message } from 'antd';
-import dayjs from 'dayjs';
-import { redirect } from 'react-router-dom';
 import { EvaluteRequesDto } from 'types/request';
 
 const { Option } = Select;

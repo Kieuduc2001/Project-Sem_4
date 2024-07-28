@@ -1,5 +1,7 @@
 
 
+
+
 export interface IResponse<T> {
   data: T;
   message: string;
@@ -139,17 +141,17 @@ export interface SchoolYearClassAndSubEntrusted {
   classList: SchoolYearClassEntrusted[]
 }
 export interface SchoolYearSubEntrusted {
+  id: number,
+  subject: {
     id: number,
-    subject: {
-      id: number,
-      code: string,
-      type: string,
-      subjectPointType: string,
-      description: null,
-      name: string,
-      numberType: boolean
-    },
-    schoolYear: null
+    code: string,
+    type: string,
+    subjectPointType: string,
+    description: null,
+    name: string,
+    numberType: boolean
+  },
+  schoolYear: null
 }
 export interface SchoolYearClassEntrusted {
 
@@ -186,6 +188,30 @@ export interface SchoolYearSubjectResponse {
   };
 }
 
+export interface ClassAndSubjectTeacher {
+  id: number,
+  className: string,
+  classCode: string,
+  grade: {
+    id: number,
+    name: number
+  },
+  subjects: SchoolYearSubject[]
+}
+
+export interface SchoolYearSubject {
+  id: number,
+  subject: {
+    id: number,
+    code: string,
+    type: string,
+    subjectPointType: string,
+    description: null,
+    name: string,
+    numberType: boolean
+  },
+  schoolYear: null
+}
 export interface ClassAndSubjectTeacher {
   id: number,
   className: string,
@@ -249,25 +275,35 @@ export interface Acknowledge {
   id: number,
   Acknowledge: string
 }
-export interface ScoreTypes {
-  DTB: number[] | undefined;
-  KTTX: number[] | undefined;
-  KT_CUOI_KY: number[] | undefined;
-  KT_GIUA_KY: number[] | undefined;
+
+export interface Score {
+  semesterName: string,
+  pointType: string,
+  id: number,
+  semester: number,
+  score: string
+}
+export interface StudentScoreSubject {
+  studentScores:ScoreType
+  studentYearInfo:StudentYearInfo
+}
+export interface ScoreType {
+  DTB: Array<Score>;
+  KTTX: Array<Score>;
+  KT_CUOI_KY: Array<Score>;
+  KT_GIUA_KY: Array<Score>;
+}
+
+
+
+interface StudentYearInfo {
+  studentYearInfoId: number;
+  fullName: string;
 }
 export interface EvaluateData {
-  studentScores: ScoreTypes;
-  id: number;
-  note: string;
-  semester: string;
-  semesterName: string;
-  status: string;
-  studentYearInfo: {
-    studentYearInfoId?: number,
-    fullName: string,
-    classId: number,
-    birthday: string
-  }
+  schoolYearSubject: null,
+  studentScores: ScoreType;
+  studentYearInfo: StudentYearInfo;
 }
 export interface Student {
   id: number,
@@ -282,7 +318,6 @@ export interface Student {
     studentStatuses: Array<StudentStatus>;
     attendenceData?: AttendenceData;
     evaluate?: EvaluateData;
-    subject?: SubjectProgram;
   }
 }
 
@@ -628,7 +663,6 @@ export interface HomeworkTeacher {
 
 }
 
-}
 export interface AttendenceData {
   id: number,
   attendanceStatus: string,
