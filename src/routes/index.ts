@@ -1,13 +1,9 @@
 import { FC, LazyExoticComponent, lazy } from 'react';
 
-<<<<<<< HEAD
 import { FC, LazyExoticComponent, lazy } from 'react'
 
 
 type LazyComponent = LazyExoticComponent<FC<any>>
-=======
-type LazyComponent = LazyExoticComponent<FC<any>>;
->>>>>>> b6174c4a4e7c3ccb006f589080c9c2f129c71eb3
 
 interface RouteConfig {
   path: string;
@@ -16,7 +12,6 @@ interface RouteConfig {
   roles: string[];
 }
 
-<<<<<<< HEAD
 const Attendence = lazy(() => import('../pages/Attendence/Attendence'))
 const Students = lazy(() => import('../pages/Students/Student-list'))
 const SchoolYears = lazy(() => import('../pages/School-years/School-years'))
@@ -24,21 +19,6 @@ const ClassesList = lazy(() => import('../pages/Category/School-year-class'))
 const AppTeachers  = lazy(() => import('../pages/AppTeachers/AppTeachers'));
 const SchoolYearSubject = lazy(() => import('../pages/Category/School-year-subjects'));
 const SchoolYearTeacher = lazy(() => import('../pages/Category/Teacher-school-year'));
-=======
-const Attendence = lazy(() => import('../pages/Attendence/Attendence'));
-const Students = lazy(() => import('../pages/Students/Student-list'));
-const Teachers = lazy(() => import('../pages/School-years/TeacherList'));
-
-const SchoolYears = lazy(() => import('../pages/School-years/School-years'));
-const ClassesList = lazy(() => import('../pages/Category/School-year-class'));
-
-const SchoolYearSubject = lazy(
-  () => import('../pages/Category/School-year-subjects')
-);
-const SchoolYearTeacher = lazy(
-  () => import('../pages/Category/Teacher-school-year')
-);
->>>>>>> b6174c4a4e7c3ccb006f589080c9c2f129c71eb3
 const SubjectProgram = lazy(() => import('../pages/Category/Subject-program'));
 const Profile = lazy(() => import('../pages/Profile'));
 const NoSchedule = lazy(() => import('../pages/Teaching/No-schedule'));
