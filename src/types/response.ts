@@ -1,3 +1,5 @@
+
+
 export interface IResponse<T> {
   data: T;
   message: string;
@@ -111,8 +113,8 @@ export interface SubjectProgram {
       end: string;
     };
   };
+  evaluate?: EvaluateData;
 }
-
 export interface SchoolYearClassData {
   id: number;
   className: string;
@@ -132,7 +134,41 @@ export interface SchoolYearClassData {
     }
   }
 }
+export interface SchoolYearClassAndSubEntrusted {
+  schoolYearSubject: SchoolYearSubEntrusted,
+  classList: SchoolYearClassEntrusted[]
+}
+export interface SchoolYearSubEntrusted {
+    id: number,
+    subject: {
+      id: number,
+      code: string,
+      type: string,
+      subjectPointType: string,
+      description: null,
+      name: string,
+      numberType: boolean
+    },
+    schoolYear: null
+}
+export interface SchoolYearClassEntrusted {
 
+  numberOfStudent: number,
+  completedQuantity: number,
+  classInfo: {
+    id: number,
+    className: string,
+    classCode: string,
+    grade: {
+      id: number,
+      name: string
+    },
+    room: null,
+    teacherSchoolYear: null,
+    schoolYear: null
+  },
+  completed: null
+}
 export interface SchoolYearSubjectResponse {
   id: number;
   classId: number;
@@ -150,13 +186,30 @@ export interface SchoolYearSubjectResponse {
   };
 }
 
-// export interface ProgramData {
-//   id: number;
-//   schoolYearSubjectId: string;
-//   gradeId: string;
-//   number: number;
-//   sem: string;
-// }
+export interface ClassAndSubjectTeacher {
+  id: number,
+  className: string,
+  classCode: string,
+  grade: {
+    id: number,
+    name: number
+  },
+  subjects: SchoolYearSubject[]
+}
+
+export interface SchoolYearSubject {
+  id: number,
+  subject: {
+    id: number,
+    code: string,
+    type: string,
+    subjectPointType: string,
+    description: null,
+    name: string,
+    numberType: boolean
+  },
+  schoolYear: null
+}
 
 export interface GradeData {
   id: number;
@@ -196,41 +249,26 @@ export interface Acknowledge {
   id: number,
   Acknowledge: string
 }
-export interface DataTypeEvaluate {
-  key: number;
-  Stt: number;
-  Ho_Ten: string;
-  Ngay_sinh: string;
-  Nhan_Xet: JSX.Element;
-  Toan: number,
-  Tieng_viet: number;
-  Tieng_anh: number;
-  Dao_duc: number;
-  Tu_nhien_va_xa_hoi: number;
-  Lich_su: number;
-  Dia_ly: number;
-  Khoa_hoc: number;
-  Tin_hoc_va_cong_nghe: number;
-  The_duc: number;
-  Mi_thuat: number;
-  Am_nhac: number;
-  Trang_Thai: string;
-  Hanh_kiem: string;
-  Tong: number;
+export interface ScoreTypes {
+  DTB: number[] | undefined;
+  KTTX: number[] | undefined;
+  KT_CUOI_KY: number[] | undefined;
+  KT_GIUA_KY: number[] | undefined;
 }
-
-export interface DataTypeAttendence {
-  key: number;
-  Stt: number;
-  Ho_Ten: string;
-  Ngay_sinh: string;
-  Co_Mat: JSX.Element;
-  Nghi_Co_Phep: JSX.Element;
-  Nghi_Khong_Phep: JSX.Element;
-  Ghi_Chu: JSX.Element;
-  Trang_Thai: number
+export interface EvaluateData {
+  studentScores: ScoreTypes;
+  id: number;
+  note: string;
+  semester: string;
+  semesterName: string;
+  status: string;
+  studentYearInfo: {
+    studentYearInfoId?: number,
+    fullName: string,
+    classId: number,
+    birthday: string
+  }
 }
-
 export interface Student {
   id: number,
   students: {
@@ -241,16 +279,23 @@ export interface Student {
     birthday: string,
     address: string,
     studentCode: string,
-    studentStatuses: {
-      id: number;
-      description: string;
-      status: {
-        id: number;
-        name: string;
-        code: string;
-      }
-    }[]
+    studentStatuses: Array<StudentStatus>;
+    attendenceData?: AttendenceData;
+    evaluate?: EvaluateData;
+    subject?: SubjectProgram;
   }
+}
+
+export interface StudentStatus {
+  id: number;
+  description: string;
+  status: Status;
+}
+
+export interface Status {
+  id: number;
+  name: string;
+  code: string;
 }
 
 export interface TeacherClassSubjectData {
@@ -370,6 +415,33 @@ export interface SubjectForSchedule {
   };
 }
 
+
+
+export interface CalendarRelease {
+  id: number;
+  title: string;
+  releaseAt: string;
+  schoolYear: {
+    id: number;
+    startSem1: string;
+    startSem2: string;
+    end: string;
+  };
+  schedules: {
+    id: number;
+    indexLesson: number;
+    studyTime: 'SANG' | 'CHIEU';
+    dayOfWeek: 'T2' | 'T3' | 'T4' | 'T5' | 'T6';
+    note: string | null;
+    teacherSchoolYearId: number;
+    schoolYearClassId: number;
+    schoolYearSubjectId: number;
+    teacherName: string;
+    className: string;
+    subjectName: string;
+  }[];
+}
+
 export interface FeeList {
   id: number;
   title: string;
@@ -402,27 +474,170 @@ export interface FeeList {
   }[];
 }
 
-export interface CalendarRelease {
+export interface FeePeriodResponse {
   id: number;
   title: string;
-  releaseAt: string;
-  schoolYear: {
-    id: number;
-    startSem1: string;
-    startSem2: string;
-    end: string;
-  };
-  schedules: {
-    id: number;
-    indexLesson: number;
-    studyTime: 'SANG' | 'CHIEU';
-    dayOfWeek: 'T2' | 'T3' | 'T4' | 'T5' | 'T6';
-    note: string | null;
-    teacherSchoolYearId: number;
-    schoolYearClassId: number;
-    schoolYearSubjectId: number;
-    teacherName: string;
-    className: string;
-    subjectName: string;
+  content: string | null;
+  status: boolean;
+  statusCode: string;
+  endDate: string;
+  createdAt: string;
+  classList: {
+    schoolYearClass: {
+      id: number;
+      className: string;
+      classCode: string;
+      grade: {
+        id: number;
+        name: string;
+      };
+      room: string | null;
+      teacherSchoolYear: string | null;
+      schoolYear: string | null;
+    };
+    totalStudent: number;
+    totalPaid: number;
   }[];
+  totalTrans: number;
+  totalPaid: number;
+}
+
+
+
+export interface FeeScope {
+  paymentTimeList: {
+    id: number;
+    name: string;
+    time: number;
+  }[];
+  scopeList: {
+    id: number;
+    name: string;
+    code: string;
+  }[];
+  unitList: {
+    id: number;
+    name: string;
+    code: string;
+  }[];
+}
+
+export interface HomeworkResponse {
+  headers: Record<string, any>;
+  body: {
+    id: number;
+    title: string;
+    content: string;
+    description: string | null;
+    status: boolean;
+    statusName: string;
+    url: string;
+    dueDate: string;
+    subject: {
+      id: number;
+      code: string;
+      type: string;
+      subjectPointType: string;
+      description: string | null;
+      name: string;
+      numberType: boolean;
+    };
+    class: {
+      id: number;
+      className: string;
+      classCode: string;
+      grade: {
+        id: number;
+        name: string;
+      };
+      room: string | null;
+      teacherSchoolYear: string | null;
+      schoolYear: string | null;
+    };
+    studentSubmission: string;
+    homeworkImageUrls: string[];
+  }[];
+  statusCode: string;
+  statusCodeValue: number;
+}
+
+export interface HomeworkDetailsResponse {
+  id: number;
+  title: string;
+  content: string;
+  dueDate: string;
+  description: string | null;
+  url: string;
+  status: boolean;
+  statusName: string;
+  overdue: boolean;
+  homeworkImageUrls: string[];
+  studentYearHomeWorks: {
+    id: number;
+    description: string;
+    url: string;
+    submitTime: string;
+    status: boolean;
+    statusName: string | null;
+    point: number;
+    studentYearInfoId: {
+      studentYearInfoId: number;
+      studentCode: string;
+      fullName: string;
+      gender: boolean | null;
+      birthday: string | null;
+      className: string;
+      classId: number;
+    };
+    imageUrl: string[];
+    subjectName: string | null;
+    teacherName: string | null;
+  }[];
+  submission: boolean;
+  subject: string | null;
+  teacherInfo: string | null;
+}
+
+export interface HomeworkTeacher {
+  schoolYearClass: {
+    id: number;
+    className: string;
+    classCode: string;
+    grade: {
+      id: number;
+      name: string;
+    };
+    room: string | null;
+    teacherSchoolYear: string | null;
+    schoolYear: string | null;
+  };
+  schoolYearSubject: {
+    id: number;
+    subject: {
+      id: number;
+      code: string;
+      type: string;
+      subjectPointType: string;
+      description: string | null;
+      name: string;
+      numberType: boolean;
+    };
+    schoolYear: string | null;
+  };
+  teacherSchoolYearClassSubject: number;
+
+}
+
+}
+export interface AttendenceData {
+  id: number,
+  attendanceStatus: string,
+  note: string,
+  createdAt: string,
+  studentInfo: {
+    studentYearInfoId?: number,
+    fullName: string,
+    classId: number,
+    birthday: string
+  }
 }

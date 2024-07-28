@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import Logo from '../images/logo/logo.svg';
 import SidebarLinkGroup from './SidebarLinkGroup';
-
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -56,6 +54,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
     }
   }, [sidebarExpanded]);
 
+  // Function to toggle sidebar
+  const toggleSidebar = () => {
+    setSidebarExpanded(!sidebarExpanded);
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <aside
       ref={sidebar}
@@ -70,12 +74,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
         <button
           ref={trigger}
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={toggleSidebar}
           aria-controls="sidebar"
           aria-expanded={sidebarOpen}
-          className="block lg:hidden"
+          className="block"
         >
-
+          <i className="fa-solid fa-bars"></i>
         </button>
       </div>
       {/* <!-- SIDEBAR HEADER --> */}
@@ -110,8 +114,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
 
+                        <i className=" fa-solid fa-chart-simple"></i>
                         Thống kê
-
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -159,6 +163,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
 
+                        <i className=" fa-solid fa-book"></i>
                         Hồ sơ
 
                       </NavLink>
@@ -219,9 +224,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
+      
 
+
+                        <i className=" fa-solid fa-list"></i>
                         Danh mục
-
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -293,6 +300,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
 
+                        <i className="fa-solid fa-chalkboard"></i>
                         Giảng dạy
 
                       </NavLink>
@@ -367,8 +375,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         }}
                       >
 
+                        <i className="fa-solid fa-pen-to-square"></i>
                         Đánh giá
-
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -440,9 +448,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
-
+                        <i className=" fa-solid fa-gear"></i>
                         Hệ thống
 
+                
                       </NavLink>
                       {/* <!-- Dropdown Menu Start --> */}
                       <div
@@ -462,6 +471,117 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             </NavLink>
                           </li>
 
+                        </ul>
+                      </div>
+                      {/* <!-- Dropdown Menu End --> */}
+                    </React.Fragment>
+                  );
+                }}
+              </SidebarLinkGroup>
+              {/* <!-- Menu Item System --> */}
+
+              {/* <!-- Menu Item Fee --> */}
+              <SidebarLinkGroup
+                activeCondition={
+                  pathname === '/fee-list' || pathname.includes('fee-list')
+                }
+              >
+                {(handleClick, open) => {
+                  return (
+                    <React.Fragment>
+                      <NavLink
+                        to="/fee-list"
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          sidebarExpanded
+                            ? handleClick()
+                            : setSidebarExpanded(true);
+                        }}
+                      >
+                        <i className=" fa-solid fa-money-check-dollar"></i>
+                        Quản lý thu
+
+                      </NavLink>
+                      {/* <!-- Dropdown Menu Start --> */}
+                      <div
+                        className={`translate transform overflow-hidden ${!open && 'hidden'
+                          }`}
+                      >
+                        <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                          <li>
+                            <NavLink
+                              to="/fee-list"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Khoản thu
+                            </NavLink>
+                          </li>
+
+                          <li>
+                            <NavLink
+                              to="/fee-sign"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Đợt thu
+                            </NavLink>
+                          </li>
+
+                        </ul>
+                      </div>
+                      {/* <!-- Dropdown Menu End --> */}
+                    </React.Fragment>
+                  );
+                }}
+              </SidebarLinkGroup>
+              {/* <!-- Menu Item System --> */}
+
+              {/* <!-- Menu Homework --> */}
+              <SidebarLinkGroup
+                activeCondition={
+                  pathname === '/homework' || pathname.includes('homework')
+                }
+              >
+                {(handleClick, open) => {
+                  return (
+                    <React.Fragment>
+                      <NavLink
+                        to="/homework"
+                        className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          sidebarExpanded
+                            ? handleClick()
+                            : setSidebarExpanded(true);
+                        }}
+                      >
+                        <i className=" fa-solid fa-book-open"></i>
+                        Bài tập về nhà
+
+                      </NavLink>
+                      {/* <!-- Dropdown Menu Start --> */}
+                      <div
+                        className={`translate transform overflow-hidden ${!open && 'hidden'
+                          }`}
+                      >
+                        <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                          <li>
+                            <NavLink
+                              to="/homework"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Quản lý bài tập
+                            </NavLink>
+                          </li>
                         </ul>
                       </div>
                       {/* <!-- Dropdown Menu End --> */}

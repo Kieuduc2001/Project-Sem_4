@@ -2,14 +2,22 @@ import { Link } from 'react-router-dom';
 import Logo from '../images/logo/logo-icon.svg';
 import { Select } from 'antd';
 import DropdownUser from './DropdownUser';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { YearContext } from '../context/YearProvider/YearProvider';
+import Typography from 'antd/es/typography/Typography';
+import Notification from './Notification'; // Import the new Notification component
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
   const { idYear, setIdYear, schoolYears } = useContext(YearContext);
+
+  useEffect(() => {
+    if (schoolYears.length > 0 && !idYear) {
+      setIdYear(schoolYears[0].id);
+    }
+  }, [schoolYears, idYear, setIdYear]);
 
   const handleChange = (value: number) => {
     setIdYear(value);
@@ -102,15 +110,20 @@ const Header = (props: {
               </div>
             </form>
           </div>
-          <div style={{ marginRight: '14px' }}>
+          <div className='flex items-center'>
+            <Typography className='text-xl text-font-medium mr-4'>Năm Học</Typography>
             <Select
               className="w-[130px] h-10"
               options={optionsYear}
+              
               value={idYear}
               onChange={handleChange}
             />
           </div>
           <div className="flex items-center gap-3 2xsm:gap-7">
+            <div className='pr-1'>
+              <Notification />
+            </div>
             {/* <DarkModeSwitcher /> */}
             <DropdownUser />
           </div>

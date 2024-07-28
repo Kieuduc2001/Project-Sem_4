@@ -2,7 +2,8 @@ import axios from 'axios';
 import { getCookie, setCookie } from '../utils/storage/cookie-storage';
 import { Storage } from '../contstants/storage';
 
-const baseURL = 'http://222.254.14.191:4869';
+const baseURL = 'http://113.178.34.234:4869';
+
 const mainAxios = axios.create({
   baseURL,
   headers: { 'Content-Type': 'application/json' },
@@ -51,7 +52,7 @@ mainAxios.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.token}`;
         return axios(originalRequest);
       } catch (refreshError) {
-        // Xử lý lỗi khi không thể refresh token (ví dụ: token hết hạn)
+
         console.error('Could not refresh token:', refreshError);
         // Đăng xuất người dùng hoặc xử lý lỗi một cách phù hợp
         // Ví dụ: dispatch một hành động để đăng xuất người dùng

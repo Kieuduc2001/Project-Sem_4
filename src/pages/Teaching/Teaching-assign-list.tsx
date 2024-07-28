@@ -15,7 +15,7 @@ import { TeacherClassSubjectData } from '../../types/response';
 import Loader from '../../common/Loader';
 import axios from 'axios';
 
-const App: React.FC = () => {
+const TeachingAssign: React.FC = () => {
   const [teacherClassSubject, setTeacherClassSubject] = useState<TeacherClassSubjectData[]>([]);
   const { idYear } = useContext(YearContext);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +28,7 @@ const App: React.FC = () => {
         const res = await teacherApi.getTeacherSchoolYearClassSubject(idYear);
         setTeacherClassSubject(res?.data);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 2000) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
           setTeacherClassSubject([]);
         } else {
           console.error('Failed to fetch school year classes:', error);
@@ -123,4 +123,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App; 
+export default TeachingAssign; 
