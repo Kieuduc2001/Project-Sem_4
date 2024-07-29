@@ -187,7 +187,15 @@ export interface SchoolYearSubjectResponse {
     end: string;
   };
 }
-
+export interface SchoolYearClassHomeRoomTeacherData {
+  id: number,
+  className: string,
+  classCode:string,
+  grade: {
+    id: number,
+    name:string
+}
+}
 export interface ClassAndSubjectTeacher {
   id: number,
   className: string,

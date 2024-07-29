@@ -49,7 +49,11 @@ const Evaluate = () => {
   useEffect(() => {
     fetchSchoolYearClassData();
     fetchStudents(true);
-  }, [subjectIdGrade])
+  }, [subjectIdGrade]);
+  useEffect(() => {
+    fetchStudents(true);
+  }, [semester])
+  
   const fetchSchoolYearClassData = async () => {
     if (idYear === null) return;
     try {
@@ -78,8 +82,9 @@ const Evaluate = () => {
         if (getStudents) {
           const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
           if (studentRes.status === 200) {
+            console.log("evaluateRes", semester)
+
             const evaluateRes = await teacherApi.getEvaluateSubject(classId, subjectIdGrade, semester)
-            console.log("evaluateRes", evaluateRes)
             if (evaluateRes.status === 200) {
               const newStudent = studentRes.data.map((sd: Student) => {
                 sd.students.evaluate = evaluateRes.data.studentScoreSubject.find((el: EvaluateData) => el.studentYearInfo.studentYearInfoId === sd.id);
@@ -110,11 +115,9 @@ const Evaluate = () => {
   const handleClassChange = (value: number, option: any) => {
     setClassId(value);
     setIdGrade(option.IdGrade);
-    fetchStudents(true);
   };
   const handleSemmerChange = (value: string) => {
     setSemester(value);
-    fetchStudents(true)
   };
   const formatDate = (dateString: string) => {
     const dateObject = new Date(dateString);
@@ -125,7 +128,6 @@ const Evaluate = () => {
   };
   const handleSubjectClassChange = (value: number) => {
     setSubjectGrade(value);
-    fetchStudents(true)
   }
   const columnEvaluate: TableColumnsType<Student> = [
     {
