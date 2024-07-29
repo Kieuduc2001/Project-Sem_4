@@ -1,44 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import { Badge, Dropdown, Menu } from 'antd';
 import { BellOutlined } from '@ant-design/icons';
-// import { onMessageListener } from 'firebase';
+import { getDeviceToken, onMessageListener } from '../firebase';
+import mainAxios from '../apis/main-axios';
 
-interface Notification {
-  id: any;
-  title: any;
-  body: any;
+interface NotificationData {
+  id: string;
+  title: string;
+  body: string;
 }
 
 const Notification: React.FC = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationData[]>([]);
 
-  // useEffect(() => {
-  //   onMessageListener()
-  //     .then((payload) => {
-  //       console.log('Received foreground message: ', payload);
-  //       const { title, body } = payload.notification || {};
-  //       if (title && body) {
-  //         const newNotification: Notification = {
-  //           id: new Date().toISOString(),
-  //           title,
-  //           body,
-  //         };
-  //         setNotifications((prevNotifications) => [
-  //           ...prevNotifications,
-  //           newNotification,
-  //         ]);
-  //         new Notification(title, { body });
-  //       }
-  //     })
-  //     .catch((err) => console.log('Failed to receive foreground message', err));
-  // }, []);
+  useEffect(() => {
+    getDeviceToken();
+
+    onMessageListener()
+      .then((payload) => {
+        if (payload.notification) {
+          const newNotification = {
+            id: payload.messageId ?? Math.random().toString(36).substr(2, 9), // generate a random ID if messageId is not available
+            title: payload.notification.title ?? 'No Title',
+            body: payload.notification.body ?? 'No Body',
+          };
+          setNotifications((prevNotifications) => [
+            ...prevNotifications,
+            newNotification,
+          ]);
+        }
+        console.log(payload);
+      })
+      .catch((err) => console.log('Failed to receive foreground message', err));
+  }, []);
+  const [data, setData] = useState<any[]>();
+  const handleChange = async() => {
+    try {
+      const res = await mainAxios.get(`/get-user-notifications?page=0&size=5`);
+      setData(res?.data?.content);
+      console.log(res?.data.content);
+    } catch (error) {
+      
+    }
+  }
+  
+  useEffect(() => {
+    handleChange();
+  }, []);
 
   const NotificationMenu = (
     <Menu>
-      {notifications.length === 0 ? (
+      {data?.length === 0 ? (
         <Menu.Item key="no-notifications">No notifications</Menu.Item>
       ) : (
-        notifications.map((notification) => (
+        data?.map((notification) => (
           <Menu.Item key={notification.id}>
             <strong>{notification.title}</strong>
             <p>{notification.body}</p>
@@ -50,7 +65,7 @@ const Notification: React.FC = () => {
 
   return (
     <Dropdown overlay={NotificationMenu} placement="bottomRight" arrow>
-      <Badge count={notifications.length} offset={[10, 0]}>
+      <Badge count={data?.length} offset={[10, 0]}>
         <BellOutlined style={{ fontSize: '20px' }} />
       </Badge>
     </Dropdown>

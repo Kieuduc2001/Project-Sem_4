@@ -47,7 +47,8 @@ enum URL {
   GET_EVALUATE_SUBJECT ='/api/v1/student-score/get-student-score-subject',
 
   GET_CLASS_TEACHER = '/api/v1/teacher/getClasses',
-  GET_SCHOOL_YEAR_CLASS_ENTRUSTED = '/api/v1/student-score/get-class-list-entrusted'
+  GET_SCHOOL_YEAR_CLASS_ENTRUSTED = '/api/v1/student-score/get-class-list-entrusted',
+  GET_CLASS_HOMEROOM_TEACHER = '/api/v1/teacher/get-homeroom-classes'
 }
 
 const teacherApi = {
@@ -183,6 +184,10 @@ const teacherApi = {
   getHomeworkTeacher: (id: number): Promise<IResponse<any>> => {
     return mainAxios.get(`${URL.GET_TEACHER_FOR_HOMEWROK}?schoolYearId=${id}`)
   },
+  getSchoolYearClassHomeRoomTeacher:(IdYear:number): Promise<IResponse<any>> => {
+    return mainAxios.get(`${URL.GET_CLASS_HOMEROOM_TEACHER}?schoolYearId=${IdYear}`)
+  }
+  ,
   postCreateHomework: (formData: FormData): Promise<IResponse<any>> => {
     return mainAxios.post(URL.CREATE_HOMEWORK, formData, {
       headers: {

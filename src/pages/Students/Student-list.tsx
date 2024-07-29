@@ -101,7 +101,6 @@ export default function Students() {
         message: 'Thành công',
       });
       setIsModalOpen(false);
-      fetchStudents();
     } catch (error: any) {
       if (error.response.message) {
         notification.error({ message: error.response.message });

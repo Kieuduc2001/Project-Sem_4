@@ -4,5 +4,6 @@ export enum Storage {
   refresh_token = 'refresh_token',
   user = 'user',
   idYear = 'idYear',
+  currentToken = 'currentToken',
 }
 

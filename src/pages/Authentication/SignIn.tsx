@@ -5,17 +5,21 @@ import { setCookie } from '../../utils/storage/cookie-storage';
 import { Storage } from '../../contstants/storage';
 import { useAppDispatch } from '../../redux/hooks';
 import { setIsLogin } from '../../redux/slices/isLogin-slice';
-import { setLocalStorageItem } from '../../utils/storage/local-storage';
+import { getLocalStorageItem, setLocalStorageItem } from '../../utils/storage/local-storage';
 import { Icon } from '../../icon/icon';
 // import Logo from '../images/logo';
 const SignIn = () => {
   const [form] = Form.useForm()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
-
-  const handleLogin = async (values: any) => {
+   const deviceToken = getLocalStorageItem(Storage.currentToken);
+   const handleLogin = async (values: any) => {
+     const loginPayload = {
+       ...values,
+       deviceToken,
+     };
     try {
-      const response = await mainAxios.post('/api/v1/auth/login', values)
+      const response = await mainAxios.post('/api/v1/auth/login', loginPayload);
       console.log(response);
       setCookie(Storage.token, response?.data?.authResponse.token)
       setCookie(Storage.refresh_token, response?.data?.authResponse?.refresh_token)
