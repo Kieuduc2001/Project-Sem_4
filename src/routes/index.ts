@@ -132,12 +132,6 @@ export const coreRoutes: RouteConfig[] = [
     roles: ['ROLE_BGH'],
   },
   {
-    path: '/acknowledge',
-    component: Acknowledge,
-    title: 'Acknowledge',
-    roles: ['ROLE_GV', 'ROLE_BGH'],
-  },
-  {
     path: '/evaluate',
     component: Evaluate,
     title: 'Evaluate',
@@ -179,7 +173,6 @@ export const coreRoutes: RouteConfig[] = [
     title: 'Fee',
     roles: ['ROLE_BGH', 'ROLE_GV'],
   },
-
   {
     path: '/evaluteCreate',
     component: EvaluteCreate,
