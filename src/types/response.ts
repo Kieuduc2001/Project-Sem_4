@@ -320,10 +320,7 @@ export interface Student {
     evaluate?: EvaluateData;
   }
 }
-
 export interface StudentStatus {
-  id: number;
-  description: string;
   status: Status;
 }
 
