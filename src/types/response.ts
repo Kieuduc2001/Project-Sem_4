@@ -244,6 +244,30 @@ export interface SchoolYearSubject {
   },
   schoolYear: null
 }
+export interface ClassAndSubjectTeacher {
+  id: number,
+  className: string,
+  classCode: string,
+  grade: {
+    id: number,
+    name: number
+  },
+  subjects: SchoolYearSubject[]
+}
+
+export interface SchoolYearSubject {
+  id: number,
+  subject: {
+    id: number,
+    code: string,
+    type: string,
+    subjectPointType: string,
+    description: null,
+    name: string,
+    numberType: boolean
+  },
+  schoolYear: null
+}
 
 export interface GradeData {
   id: number;
@@ -328,10 +352,7 @@ export interface Student {
     evaluate?: EvaluateData;
   }
 }
-
 export interface StudentStatus {
-  id: number;
-  description: string;
   status: Status;
 }
 

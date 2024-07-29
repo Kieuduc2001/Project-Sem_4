@@ -359,7 +359,7 @@ const handleNoteChange = (studentId: number, note: string) => {
   }).length
 
   return (
-    <Form form={form}>
+        <Form form={form}>
       <div>
         <div style={{ display: 'flex', padding: '16px' }}>
           <Form.Item className="classId" style={{ marginRight: '14px' }}>

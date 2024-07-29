@@ -13,6 +13,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@firebase/messaging": "^0.12.10",
     "@reduxjs/toolkit": "^2.2.3",
     "@types/moment": "^2.13.0",
     "antd": "^5.16.0",
