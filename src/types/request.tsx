@@ -10,7 +10,7 @@ export interface StudentRequestDto {
   note: string;
   id?: number
 }
-export interface EvaluteDto {
+export interface EvaluteRequesDto {
   schoolYearSubjectId?: number,
   schoolYearClassId: number,
   sem: string,

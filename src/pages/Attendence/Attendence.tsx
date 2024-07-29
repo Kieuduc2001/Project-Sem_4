@@ -7,6 +7,7 @@ import Loader from '../../common/Loader';
 import {
   AttendenceData,
   SchoolYearClassData,
+  SchoolYearClassHomeRoomTeacherData,
   Student,
 } from '../../types/response';
 import { YearContext } from '../../context/YearProvider/YearProvider';
@@ -18,7 +19,7 @@ import axios from 'axios';
 const { Option } = Select;
 const Attendences = () => {
   const [student, setStudent] = useState<Student[]>([]);
-  const [schoolYearClass, setSchoolYearClass] = useState<SchoolYearClassData[]>([]);
+  const [schoolYearClassHomeRoomTeacher, setschoolYearClassHomeRoomTeacher] = useState<SchoolYearClassHomeRoomTeacherData[]>([]);
   const { idYear } = useContext(YearContext);
   const [classId, setClassId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,13 +38,13 @@ const Attendences = () => {
   }, [idYear])
 
   useEffect(() => {
-    if (schoolYearClass.length > 0) {
-      setClassId(schoolYearClass[0].id);
+    if (schoolYearClassHomeRoomTeacher.length > 0) {
+      setClassId(schoolYearClassHomeRoomTeacher[0].id);
     }
     else {
       setClassId(null);
     }
-  }, [schoolYearClass]);
+  }, [schoolYearClassHomeRoomTeacher]);
 
   useEffect(() => {
     fetchStudents(true);
@@ -52,7 +53,7 @@ const Attendences = () => {
   const fetchStudents = async (getStudents: boolean = false): Promise<void> => {
     form.resetFields(["note"]);
     try {
-      if (schoolYearClass !== null && classId !== null && classId !== undefined) {
+      if (schoolYearClassHomeRoomTeacher !== null && classId !== null && classId !== undefined) {
         if (getStudents) {
           const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
           if (studentRes.status === 200) {
@@ -92,13 +93,13 @@ const Attendences = () => {
   const fetchSchoolYearClassData = async () => {
     if (idYear === null) return;
     try {
-      const res = await teacherApi.getSchoolYearClass(idYear);
-      setSchoolYearClass(res?.data);
-      setClassId(schoolYearClass[0]?.id);
+      const res = await teacherApi.getSchoolYearClassHomeRoomTeacher(idYear);
+      setschoolYearClassHomeRoomTeacher(res?.data);
+      setClassId(schoolYearClassHomeRoomTeacher[0]?.id);
 
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
-        setSchoolYearClass([]);
+        setschoolYearClassHomeRoomTeacher([]);
         setStudent([]);
       } else if (error instanceof Error) {
         console.error('Failed to fetch school year classes:', error.message);
@@ -115,6 +116,27 @@ const Attendences = () => {
   const handleChange = (value: number) => {
     setClassId(value);
   };
+
+const handleNoteChange = (studentId: number, note: string) => {
+  setStudent(prevStudents =>
+    prevStudents.map(student => {
+      if (student.id === studentId) {
+          return {
+            ...student,
+            students: {
+              ...student.students,
+              attendenceData: {
+                ...student.students.attendenceData,
+                note:note
+              }
+            }
+        
+          }
+        }
+      return student;
+    }) as Student[]
+  );
+};
 
   const handleChangeDay = (value: any) => {
     if (value) {
@@ -251,11 +273,16 @@ const Attendences = () => {
       width: '20%',
       key: 'Ghi_Chu',
       align: 'center',
-      render: (_, item) => (
-        console.log("gshdg", item.students.attendenceData?.note),
-        <Form.Item name={['note', item.id]} key={item.id}>
-          <TextArea defaultValue={item.students.attendenceData?.note ? item.students.attendenceData.note : ""} autoSize />
-        </Form.Item>
+      render: (_, record) => (
+        <Form.Item name={['note', record.id]} key={record.id}
+        initialValue={record.students?.attendenceData?.note ? record.students?.attendenceData?.note : ""}>
+        <TextArea
+          value={record.students.attendenceData ? record.students.attendenceData.note : ""}
+          onChange={(e) => handleNoteChange(record.id, e.target.value)}
+          autoSize
+          defaultValue={"acvb"}
+        />
+      </Form.Item>
       )
     }
   ];
@@ -332,65 +359,65 @@ const Attendences = () => {
   }).length
 
   return (
-      <Form form={form}>
-        <div>
-          <div style={{ display: 'flex', padding: '16px' }}>
-            <Form.Item className="classId" style={{ marginRight: '14px' }}>
-              <Select placeholder="Chọn lớp học"
-                value={classId} style={{ width: 150 }} onChange={handleChange}>
-                {schoolYearClass.map((classData) => (
-                  <Option key={classData.id} value={classData.id}>
-                    {classData.className}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item className="dayOff" name="dayOff" initialValue={dayOff}> {/* Thêm name cho Form.Item */}
-              <DatePicker
-                defaultValue={dayOff}
-                className="h-10 w-30" onChange={handleChangeDay}
-                format={'M/D/YYYY'}
-                maxDate={dayjs()}
-              />
-            </Form.Item>
+        <Form form={form}>
+      <div>
+        <div style={{ display: 'flex', padding: '16px' }}>
+          <Form.Item className="classId" style={{ marginRight: '14px' }}>
+            <Select placeholder="Chọn lớp học"
+              value={classId} style={{ width: 150 }} onChange={handleChange}>
+              {schoolYearClassHomeRoomTeacher.map((classData) => (
+                <Option key={classData.id} value={classData.id}>
+                  {classData.className}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item className="dayOff" name="dayOff" initialValue={dayOff}> {/* Thêm name cho Form.Item */}
+            <DatePicker
+              defaultValue={dayOff}
+              className="h-10 w-30" onChange={handleChangeDay}
+              format={'M/D/YYYY'}
+              maxDate={dayjs()}
+            />
+          </Form.Item>
 
-            <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
-              Tất cả: {student.length}
-            </div>
-            <div className="border border-solid border-gray-300 w-40 flex justify-center items-center rounded-md h-10">
-              Có mặt: {`${CountStudentpresent}`}
-            </div>
-            <div className="mx-4 border border-solid border-gray-300 w-45 rounded-md flex items-center justify-center h-10">
-              Có phép: {`${CountStudentSuspectedPermission}`}
-            </div>
-            <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
-              Không phép: {`${CountStudentSuspectedNotPermission}`}
-            </div>
+          <div className="mx-4 border border-solid border-green-500 w-36 flex items-center justify-center rounded-md h-10">
+            Tất cả: {student.length}
           </div>
-          {isLoading ? (
-            <Loader />
-          ) : (
-            <div className="list-student">
-              <Table
-                columns={columnsAttendenceByDay}
-                dataSource={student}
-                pagination={false}
-                bordered
-              />
-            </div>
-          )}
-          <div className="submit" style={{ display: `${attendancesData.length>0?disPlayUpdate:disPlaySubmit}` }}>
-            <Button type="primary" className="btn-submit" onClick={handleSubmit}>
-              Lưu Lại
-            </Button>
+          <div className="border border-solid border-gray-300 w-40 flex justify-center items-center rounded-md h-10">
+            Có mặt: {`${CountStudentpresent}`}
           </div>
-          <div className="submit" style={{ display: `${attendancesData.length>0?disPlaySubmit:disPlayUpdate}` }}>
-            <Button type="primary" className="btn-submit" onClick={submitUpdateAtendence}>
-              Sửa Đổi
-            </Button>
+          <div className="mx-4 border border-solid border-gray-300 w-45 rounded-md flex items-center justify-center h-10">
+            Có phép: {`${CountStudentSuspectedPermission}`}
+          </div>
+          <div className="border border-solid border-gray-300 w-52 rounded-md flex justify-center items-center h-10">
+            Không phép: {`${CountStudentSuspectedNotPermission}`}
           </div>
         </div>
-      </Form>
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <div className="list-student">
+            <Table
+              columns={columnsAttendenceByDay}
+              dataSource={student}
+              pagination={false}
+              bordered
+            />
+          </div>
+        )}
+        <div className="submit" style={{ display: `${attendancesData.length > 0 ? disPlayUpdate : disPlaySubmit}` }}>
+          <Button type="primary" className="btn-submit" onClick={handleSubmit}>
+            Lưu Lại
+          </Button>
+        </div>
+        <div className="submit" style={{ display: `${attendancesData.length > 0 ? disPlaySubmit : disPlayUpdate}` }}>
+          <Button type="primary" className="btn-submit" onClick={submitUpdateAtendence}>
+            Sửa Đổi
+          </Button>
+        </div>
+      </div>
+    </Form>
   );
 };
 

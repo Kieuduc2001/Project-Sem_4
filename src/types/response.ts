@@ -187,7 +187,39 @@ export interface SchoolYearSubjectResponse {
     end: string;
   };
 }
+export interface SchoolYearClassHomeRoomTeacherData {
+  id: number,
+  className: string,
+  classCode:string,
+  grade: {
+    id: number,
+    name:string
+}
+}
+export interface ClassAndSubjectTeacher {
+  id: number,
+  className: string,
+  classCode: string,
+  grade: {
+    id: number,
+    name: number
+  },
+  subjects: SchoolYearSubject[]
+}
 
+export interface SchoolYearSubject {
+  id: number,
+  subject: {
+    id: number,
+    code: string,
+    type: string,
+    subjectPointType: string,
+    description: null,
+    name: string,
+    numberType: boolean
+  },
+  schoolYear: null
+}
 export interface ClassAndSubjectTeacher {
   id: number,
   className: string,
