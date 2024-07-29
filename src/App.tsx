@@ -6,7 +6,9 @@ import routes, { coreRoutes } from './routes';
 import { getCookie } from './utils/storage/cookie-storage';
 import { Storage } from './contstants/storage';
 import { getLocalStorageItem } from './utils/storage/local-storage';
-// import { getMessagingDeviceToken, onMessageListener } from '../public/firebase';
+import { getDeviceToken, onMessageListener } from './firebase';
+// import { getDeviceToken, onMessageListener} from './firebase';
+
 
 
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
@@ -21,22 +23,29 @@ function App() {
 
   useEffect(() => {
     if (!token) {
-      navigate('/sign-in')
+      navigate('/sign-in');
     }
-  }, [token, navigate])
+  }, [token, navigate]);
+ 
 
-  // useEffect(() => {
-  //   getMessagingDeviceToken();
+   useEffect(() => {
+     getDeviceToken();
 
-  // }, [])
-
-  // useEffect(() => {
-  //   onMessageListener().then(data => {
-  //     console.log("Receive foreground: ", data)
-  //   })
-  // })
-
-
+     onMessageListener()
+       .then((payload) => {
+         if (payload.notification) {
+           const newNotification = {
+             id: payload.messageId ?? Math.random().toString(36).substr(2, 9), // generate a random ID if messageId is not available
+             title: payload.notification.title ?? 'No Title',
+             body: payload.notification.body ?? 'No Body',
+           };
+         }
+        //  console.log(newNotification);
+       })
+       .catch((err) =>
+         console.log('Failed to receive foreground message', err)
+       );
+   }, []);
 
   const userData = JSON.parse(getLocalStorageItem(Storage.user) || '{}')
   const userRoles = userData.roles ? userData.roles.map((item: any) => item.name) : []
