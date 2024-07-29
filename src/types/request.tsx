@@ -22,3 +22,15 @@ export interface EvaluteDto {
     }[]
   }[]
 }
+export interface EvaluteRequesDto {
+  schoolYearSubjectId?: any;
+  schoolYearClassId: any;
+  sem: any;
+  studentScoreDetails: {
+    studentYearInfoId: any;
+    scoreDetails: {
+      score: any;
+      pointType: any;
+    }[];
+  }[];
+}

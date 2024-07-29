@@ -1,17 +1,20 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Fragment, Suspense, lazy, useEffect, useState } from 'react';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Loader from './common/Loader';
 import routes, { coreRoutes } from './routes';
 import { getCookie } from './utils/storage/cookie-storage';
 import { Storage } from './contstants/storage';
 import { getLocalStorageItem } from './utils/storage/local-storage';
-// import { getDeviceToken } from './firebase';
+import { getMessagingDeviceToken, onMessageListener } from '../public/firebase';
+
+
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
 const NotFound = lazy(() => import('./pages/404page'));
 const SignIn = lazy(() => import('./pages/Authentication/SignIn'));
 const SignUp = lazy(() => import('./pages/Authentication/SignUp'));
 const ECommerce = lazy(() => import('./pages/Dashboard/ECommerce'));
+
 function App() {
   const navigate = useNavigate()
   const token = getCookie('token')
@@ -22,18 +25,22 @@ function App() {
     }
   }, [token, navigate])
 
-  // useEffect(() => {
-  //   getDeviceToken();
-  // }, []);
+  useEffect(() => {
+    getMessagingDeviceToken();
 
-  // useEffect(() => {
-  //   onMessageListener()
-  //     .then((payload) => {
-  //       console.log('Received foreground message: ', payload);
-  //       // Handle the message (show notification, etc.)
-  //     })
-  //     .catch((err) => console.log('Failed to receive foreground message', err));
-  // }, []);
+  }, [])
+
+  useEffect(() => {
+    onMessageListener().then(data => {
+      console.log("Receive foreground: ", data)
+    })
+  })
+
+  const s = () => {
+
+
+  }
+
 
   const userData = JSON.parse(getLocalStorageItem(Storage.user) || '{}')
   const userRoles = userData.roles ? userData.roles.map((item: any) => item.name) : []
