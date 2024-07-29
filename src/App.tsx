@@ -6,7 +6,7 @@ import routes, { coreRoutes } from './routes';
 import { getCookie } from './utils/storage/cookie-storage';
 import { Storage } from './contstants/storage';
 import { getLocalStorageItem } from './utils/storage/local-storage';
-import { getMessagingDeviceToken, onMessageListener } from '../public/firebase';
+// import { getMessagingDeviceToken, onMessageListener } from '../public/firebase';
 
 
 const DefaultLayout = lazy(() => import('./layout/DefaultLayout'));
@@ -25,21 +25,17 @@ function App() {
     }
   }, [token, navigate])
 
-  useEffect(() => {
-    getMessagingDeviceToken();
+  // useEffect(() => {
+  //   getMessagingDeviceToken();
 
-  }, [])
+  // }, [])
 
-  useEffect(() => {
-    onMessageListener().then(data => {
-      console.log("Receive foreground: ", data)
-    })
-  })
+  // useEffect(() => {
+  //   onMessageListener().then(data => {
+  //     console.log("Receive foreground: ", data)
+  //   })
+  // })
 
-  const s = () => {
-
-
-  }
 
 
   const userData = JSON.parse(getLocalStorageItem(Storage.user) || '{}')
