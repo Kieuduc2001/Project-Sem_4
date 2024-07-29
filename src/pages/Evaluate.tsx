@@ -1,4 +1,3 @@
-
 import { useContext, useEffect, useState } from 'react';
 import { Result, Table } from 'antd';
 import type { TableColumnsType } from 'antd';
@@ -80,7 +79,7 @@ const Evaluate = () => {
     try {
       if (schoolYearClass !== undefined && classId !== undefined) {
         if (getStudents) {
-          const studentRes = await mainAxios.get(`/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId}`);
+          const studentRes = await mainAxios.get(/api/v1/student/get-student-year-info-by?bySchoolYearClassId=${classId});
           if (studentRes.status === 200) {
             console.log("evaluateRes", semester)
 
@@ -124,7 +123,7 @@ const Evaluate = () => {
     const day = String(dateObject.getDate()).padStart(2, '0');
     const month = String(dateObject.getMonth() + 1).padStart(2, '0'); // January is 0!
     const year = dateObject.getFullYear();
-    return `${day}/${month}/${year}`;
+    return ${day}/${month}/${year};
   };
   const handleSubjectClassChange = (value: number) => {
     setSubjectGrade(value);
@@ -136,7 +135,7 @@ const Evaluate = () => {
       key: 'Stt',
       width: '5%',
       align: 'center',
-      render: (_, __, index) => index + 1,
+      render: (, _, index) => index + 1,
     },
     {
       title: 'Họ tên',

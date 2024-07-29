@@ -173,6 +173,7 @@ export const coreRoutes: RouteConfig[] = [
     title: 'Fee',
     roles: ['ROLE_BGH', 'ROLE_GV'],
   },
+
   {
     path: '/evaluteCreate',
     component: EvaluteCreate,
